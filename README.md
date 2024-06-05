@@ -19,7 +19,7 @@ git push origin main
 # Get changes from everyone else
 
 ```sh
-git fetch -A
+git fetch --all
 git status # Must have no changes
 git reset --hard origin/main # if you had changes this will destroy those changes....be careful
 ```
