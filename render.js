@@ -9,9 +9,12 @@ export class Render {
     Render.ctx = ctx;
   }
 
-  static drawText(color, message, font, x, y) {
+  static drawText(color, message, fontSize, fontFamily, x, y) {
+    x = screenToContext(x);
+    y = screenToContext(y);
+    fontSize = screenToContext(fontSize);
     Render.ctx.fillStyle = color;
-    Render.ctx.font = font;
+    Render.ctx.font = `${fontSize}px ${fontFamily}`;
     Render.ctx.fillText(message, x, y);
   }
 
