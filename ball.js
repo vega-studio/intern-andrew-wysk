@@ -1,3 +1,5 @@
+import { Render } from "./render.js";
+
 export class Ball {
   constructor(x, y, radius, velocity, color) {
     this.x = x;
@@ -14,9 +16,6 @@ export class Ball {
     this.x += xChange;
     this.y += yChange;
   }
-  collision() {
-    //Implement
-  }
   reset(w, h) {
     this.x = w;
     this.y = h;
@@ -24,11 +23,7 @@ export class Ball {
     if (this.isLeft) this.theta = Math.PI;
     else this.theta = Math.PI * 2;
   }
-  show(dimension) {
-    dimension.fillStyle = this.color;
-    dimension.beginPath();
-    dimension.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    dimension.fill();
-    dimension.closePath();
+  show() {
+    Render.drawCircle(this.color, this.radius, this.x, this.y);
   }
 }

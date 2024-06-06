@@ -1,3 +1,5 @@
+import { Render } from "./render.js";
+
 export class Paddle {
   constructor(x, y, width, height) {
     this.x = x;
@@ -9,8 +11,7 @@ export class Paddle {
   position() {
     this.y += this.yChange;
   }
-  show(dimension) {
-    dimension.fillStyle = "#fff";
-    dimension.fillRect(this.x, this.y, this.width, this.height);
+  show() {
+    Render.drawRectangle("#fff", this.width, this.height, this.x, this.y);
   }
 }

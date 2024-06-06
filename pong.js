@@ -50,7 +50,7 @@ export class Pong {
   }
 
   /**
-   * score: checks whether ball reached either end and adds to score accordingly. Resets ball after.
+   * Score checks whether ball reached either end and adds to score accordingly. It also resets the ball after
    */
   score() {
     if (this.ball.x - this.ball.radius < -5) {
@@ -67,26 +67,59 @@ export class Pong {
   }
 
   /**
-   * displayScore: makes characters for score appear at top middle that change based on each current score.
+   * DisplayScore makes characters for score appear at top middle that change based on each current score
    *
    * @param {CanvasRenderingContext2D} dim
    */
   displayScore(dim, score) {
-    dim.fillStyle = "#fff";
-    dim.fillRect(this.screenSize.width / 2 + 7, 0, 3, this.screenSize.height); // Center line
-    dim.font = "10px Arial";
-    dim.fillText("Press ' f ' to increase speed!", 15, 15);
-    dim.font = "30px Arial";
+    Render.drawRectangle(
+      "#fff",
+      this.screenSize.width / 2 + 7,
+      0,
+      3,
+      this.screenSize.height
+    ); // Center line
+    Render.drawText("#fff", "INCREASE SPEED: [f]!", "10px Arial", 15, 15);
     if (score === this.score1)
-      if (score >= 10) dim.fillText(9, this.screenSize.width / 2 - 30, 40);
-      else dim.fillText(score, this.screenSize.width / 2 - 30, 40);
+      if (score >= 10)
+        Render.drawText(
+          "#fff",
+          9,
+          "30px Arial",
+          this.screenSize.width / 2 - 30,
+          40
+        );
+      else
+        Render.drawText(
+          "#fff",
+          score,
+          "30px Arial",
+          this.screenSize.width / 2 - 30,
+          40
+        );
     if (score === this.score2)
-      if (score >= 10) dim.fillText(9, this.screenSize.width / 2 + 30, 40);
-      else dim.fillText(score, this.screenSize.width / 2 + 30, 40);
+      if (score >= 10)
+        Render.drawText(
+          "#fff",
+          9,
+          "30px Arial",
+          this.screenSize.width / 2 + 30,
+          40
+        );
+      else
+        Render.drawText(
+          "#fff",
+          score,
+          "30px Arial",
+          this.screenSize.width / 2 + 30,
+          40
+        );
     if (this.score1 >= 10 || this.score2 >= 10) {
       // Win feature -- add win string ("PLAYER _ WINS!") and delay restart
-      this.score1 = 0;
-      this.score2 = 0;
+      setTimeout(() => {
+        this.score1 = 0;
+        this.score2 = 0;
+      }, 1000);
     }
   }
 

@@ -9,15 +9,22 @@ export class Render {
     Render.ctx = ctx;
   }
 
-  static drawText(message, fontSize, x, y) {
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(this.screenSize.width / 2 + 7, 0, 3, this.screenSize.height); // Center line
-    ctx.font = "10px Arial";
-    ctx.fillText("Press ' f ' to increase speed!", 15, 15);
-    ctx.font = "30px Arial";
+  static drawText(color, message, font, x, y) {
+    Render.ctx.fillStyle = color;
+    Render.ctx.font = font;
+    Render.ctx.fillText(message, x, y);
   }
 
-  static drawCircle() {}
+  static drawCircle(color, radius, x, y) {
+    Render.ctx.fillStyle = color;
+    Render.ctx.beginPath();
+    Render.ctx.arc(x, y, radius, 0, Math.PI * 2);
+    Render.ctx.fill();
+    Render.ctx.closePath();
+  }
 
-  static drawRectangle() {}
+  static drawRectangle(color, width, height, x, y) {
+    Render.ctx.fillStyle = color;
+    Render.ctx.fillRect(x, y, width, height);
+  }
 }
