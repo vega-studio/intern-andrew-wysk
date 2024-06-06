@@ -1,10 +1,10 @@
 export class Paddle {
-  constructor(x, y, width, height, velocity) {
+  constructor(x, y, width, height) {
     this.x = x;
     this.y = y;
     this.width = 7;
     this.height = 70;
-    this.yChange = velocity;
+    this.yChange = 2;
   }
   position() {
     this.y += this.yChange;

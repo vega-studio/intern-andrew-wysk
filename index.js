@@ -1,2 +1,2 @@
 import { Pong } from "./pong.js";
-const game = new Pong("game-board", 5);
+const game = new Pong("game-board");

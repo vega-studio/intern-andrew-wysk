@@ -1,11 +1,12 @@
 export class Ball {
-  constructor(x, y, radius, velocity) {
+  constructor(x, y, radius, velocity, color) {
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.velocity = velocity;
     this.isLeft = true;
     this.theta = Math.PI;
+    this.color = color;
   }
   position() {
     const xChange = this.velocity * Math.cos(this.theta);
@@ -17,19 +18,14 @@ export class Ball {
     //Implement
   }
   reset(w, h) {
-    if (this.isLeft)
-      this.theta =
-        Math.random() * ((4 * Math.PI) / 3 - (2 * Math.PI) / 3) +
-        (2 * Math.PI) / 3;
-    else
-      this.theta =
-        Math.random() * (Math.PI / 3 - (5 * Math.PI) / 3) + (5 * Math.PI) / 3;
-    this.x = w / 2;
-    this.y = h / 2;
+    this.x = w;
+    this.y = h;
     this.isLeft = !this.isLeft;
+    if (this.isLeft) this.theta = Math.PI;
+    else this.theta = Math.PI * 2;
   }
   show(dimension) {
-    dimension.fillStyle = "#fff";
+    dimension.fillStyle = this.color;
     dimension.beginPath();
     dimension.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     dimension.fill();

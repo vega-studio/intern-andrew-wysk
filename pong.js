@@ -2,7 +2,7 @@ import { Paddle } from "./paddle.js";
 import { Ball } from "./ball.js";
 
 export class Pong {
-  constructor(canvasId, velocity) {
+  constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.dimension = this.canvas.getContext("2d");
     this.score1 = 0;
@@ -10,20 +10,20 @@ export class Pong {
     this.paddleWidth = 10;
     this.paddleHeight = 50;
     this.radius = 5;
-    this.velocity = velocity;
+    this.velocity = 5;
     this.keys = {};
     this.canvas.width = 500;
     this.canvas.height = 400;
 
-    this.paddle1 = new Paddle(
+    this.paddle1 = new Paddle( // Left paddle
       0,
       this.canvas.height / 2 - this.paddleHeight,
       this.paddleWidth,
       this.paddleHeight,
       this.velocity
     );
-    this.paddle2 = new Paddle(
-      this.canvas.width - this.paddleWidth,
+    this.paddle2 = new Paddle( // Right paddle
+      this.canvas.width - this.paddleWidth + 3,
       this.canvas.height / 2 - this.paddleHeight,
       this.paddleWidth,
       this.paddleHeight,
@@ -34,7 +34,8 @@ export class Pong {
       this.canvas.width / 2,
       this.canvas.height / 2,
       this.radius,
-      this.velocity
+      this.velocity,
+      "#f00"
     );
 
     this.initGame();
@@ -44,12 +45,16 @@ export class Pong {
    * score: checks whether ball reached either end and adds to score accordingly. Resets ball after.
    */
   score() {
-    if (this.ball.x - this.ball.radius <= 0) {
+    if (this.ball.x - this.ball.radius < -5) {
       this.score2++;
-      this.ball.reset();
-    } else if (this.ball.x + this.ball.radius >= this.canvas.width) {
+      this.velocity = 5;
+      this.ball.velocity = 5;
+      this.ball.reset(this.canvas.width / 2, this.canvas.height / 2);
+    } else if (this.ball.x + this.ball.radius > this.canvas.width + 5) {
       this.score1++;
-      this.ball.reset();
+      this.velocity = 5;
+      this.ball.velocity = 5;
+      this.ball.reset(this.canvas.width / 2, this.canvas.height / 2);
     }
   }
 
@@ -60,12 +65,21 @@ export class Pong {
    */
   displayScore(dim, score) {
     dim.fillStyle = "#fff";
+    dim.fillRect(this.canvas.width / 2 + 7, 0, 3, this.canvas.height); // Center line
+    dim.font = "10px Arial";
+    dim.fillText("Press ' f ' to increase speed!", 15, 15);
     dim.font = "30px Arial";
     if (score === this.score1)
-      dim.fillText(score, this.canvas.width / 2 - 30, this.canvas.height - 30);
+      if (score >= 10) dim.fillText(9, this.canvas.width / 2 - 30, 40);
+      else dim.fillText(score, this.canvas.width / 2 - 30, 40);
     if (score === this.score2)
-      dim.fillText(score, this.canvas.width / 2 + 30, this.canvas.height - 30);
-    dim.fillRect(this.canvas.height / 2, this, 0, 5, this.canvas.height); //Center Line
+      if (score >= 10) dim.fillText(9, this.canvas.width / 2 + 30, 40);
+      else dim.fillText(score, this.canvas.width / 2 + 30, 40);
+    if (this.score1 >= 10 || this.score2 >= 10) {
+      // Win feature -- add win string ("PLAYER _ WINS!") and delay restart
+      this.score1 = 0;
+      this.score2 = 0;
+    }
   }
 
   /**
@@ -91,17 +105,28 @@ export class Pong {
   }
 
   play() {
+    //Speed feature
+    if (this.keys["f"] && this.ball.velocity <= 15 && this.velocity <= 10) {
+      this.ball.velocity += 0.25;
+      this.velocity += 0.125;
+    }
     // Move player 1
-    if (this.paddle1.y < this.canvas.height && this.keys["w"])
+    if (this.paddle1.y > 0 && this.keys["w"])
       this.paddle1.yChange = -this.velocity;
-    else if (this.paddle1.y > 0 && this.keys["s"])
+    else if (
+      this.paddle1.y + this.paddle1.height < this.canvas.height &&
+      this.keys["s"]
+    )
       this.paddle1.yChange = this.velocity;
     else this.paddle1.yChange = 0;
 
     // Move player 2
-    if (this.paddle2.y < this.canvas.height && this.keys["ArrowUp"])
+    if (this.paddle2.y > 0 && this.keys["ArrowUp"])
       this.paddle2.yChange = -this.velocity;
-    else if (this.paddle2.y > 0 && this.keys["ArrowDown"])
+    else if (
+      this.paddle2.y + this.paddle2.height < this.canvas.height &&
+      this.keys["ArrowDown"]
+    )
       this.paddle2.yChange = this.velocity;
     else this.paddle2.yChange = 0;
     // Position the player according to their newly set velocities
@@ -115,27 +140,38 @@ export class Pong {
       this.ball.y - this.ball.radius <= 0 ||
       this.ball.y + this.ball.radius >= this.canvas.height
     ) {
-      this.ball.theta = this.ball.theta;
-      this.ball.theta *= -1;
+      this.ball.theta = this.ball.theta * -1;
     }
 
+    // Collision check with random bounce
     if (
-      // Paddle bounce: straight from chatgpt
-      (this.ball.x - this.ball.radius <= this.paddle1.x + this.paddle1.width &&
-        this.ball.y >= this.paddle1.y &&
-        this.ball.y <= this.paddle1.y + this.paddle1.height) ||
-      (this.ball.x + this.ball.radius >= this.paddle2.x &&
-        this.ball.y >= this.paddle2.y &&
-        this.ball.y <= this.paddle2.y + this.paddle2.height)
+      this.ball.x - this.ball.radius <= this.paddle1.x + this.paddle1.width &&
+      this.ball.y >= this.paddle1.y &&
+      this.ball.y <= this.paddle1.y + this.paddle1.height
     ) {
-      // Reflect the angle
-      const deltaY = this.ball.y - (this.paddle1.y + this.paddle1.height / 2);
-      const normalizedDeltaY = deltaY / (this.paddle1.height / 2);
-      const maxReflectionAngle = Math.PI / 3;
-      const reflectionAngle = normalizedDeltaY * maxReflectionAngle;
-      this.ball.theta = Math.PI - this.ball.theta + 2 * reflectionAngle;
-      this.ball.theta *= -1;
+      this.ball.theta =
+        (Math.random() * (2 * Math.PI + Math.PI / 3 - (5 * Math.PI) / 3) +
+          (5 * Math.PI) / 3) %
+        (2 * Math.PI);
+      this.ball.color = "#00f";
+    } else if (
+      this.ball.x + this.ball.radius >= this.paddle2.x &&
+      this.ball.y >= this.paddle2.y &&
+      this.ball.y <= this.paddle2.y + this.paddle2.height
+    ) {
+      this.ball.theta =
+        Math.random() * ((4 * Math.PI) / 3 - (2 * Math.PI) / 3) +
+        (2 * Math.PI) / 3;
+      this.ball.color = "#f00";
     }
+    // Change color every bounce
+    // Reflect the angle: straight from chat gpt
+    //   const deltaY = this.ball.y - (this.paddle1.y + this.paddle1.height / 2);
+    //   const normalizedDeltaY = deltaY / (this.paddle1.height / 2);
+    //   const maxReflectionAngle = Math.PI / 3;
+    //   const reflectionAngle = normalizedDeltaY * maxReflectionAngle;
+    //   this.ball.theta = (Math.PI - this.ball.theta + 2 * reflectionAngle) * -1;
+    // }
     this.ball.position();
     this.score();
   }
