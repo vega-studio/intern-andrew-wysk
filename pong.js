@@ -6,8 +6,8 @@ export class Pong {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.screenSize = this.canvas.getBoundingClientRect();
-    this.canvas.width = 3840;
-    this.canvas.height = 2160;
+    this.canvas.width = this.screenSize.width * window.devicePixelRatio;
+    this.canvas.height = this.screenSize.height * window.devicePixelRatio;
 
     this.dimension = this.canvas.getContext("2d");
     Render.setContext(this.dimension);
