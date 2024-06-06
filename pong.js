@@ -14,10 +14,10 @@ export class Pong {
 
     this.score1 = 0;
     this.score2 = 0;
-    this.paddleWidth = 10;
-    this.paddleHeight = 50;
-    this.radius = 5;
-    this.velocity = 5;
+    this.paddleWidth = 10 * window.devicePixelRatio;
+    this.paddleHeight = 50 * window.devicePixelRatio;
+    this.radius = 5 * window.devicePixelRatio;
+    this.velocity = 5 * window.devicePixelRatio;
     this.keys = {};
 
     // Left paddle
@@ -53,15 +53,18 @@ export class Pong {
    * Score checks whether ball reached either end and adds to score accordingly. It also resets the ball after
    */
   score() {
-    if (this.ball.x - this.ball.radius < -5) {
+    if (this.ball.x - this.ball.radius < -5 * window.devicePixelRatio) {
       this.score2++;
-      this.velocity = 5;
-      this.ball.velocity = 5;
+      this.velocity = 5 * window.devicePixelRatio;
+      this.ball.velocity = 5 * window.devicePixelRatio;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
-    } else if (this.ball.x + this.ball.radius > this.screenSize.width + 5) {
+    } else if (
+      this.ball.x + this.ball.radius >
+      this.screenSize.width + 5 * window.devicePixelRatio
+    ) {
       this.score1++;
-      this.velocity = 5;
-      this.ball.velocity = 5;
+      this.velocity = 5 * window.devicePixelRatio;
+      this.ball.velocity = 5 * window.devicePixelRatio;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
     }
   }
@@ -69,23 +72,31 @@ export class Pong {
   /**
    * DisplayScore makes characters for score appear at top middle that change based on each current score
    *
-   * @param {CanvasRenderingContext2D} dim
+   *
    */
   displayScore(dim, score) {
     Render.drawRectangle(
       "#fff",
-      this.screenSize.width / 2 + 7,
+      this.screenSize.width / 2,
       0,
-      3,
+      3 * window.devicePixelRatio,
       this.screenSize.height
     ); // Center line
-    Render.drawText("#fff", "INCREASE SPEED: [f]!", "10px Arial", 15, 15);
+    Render.drawText(
+      "#fff",
+      "INCREASE SPEED: [f]",
+      10,
+      "Arial",
+      15 * window.devicePixelRatio,
+      15 * window.devicePixelRatio
+    );
     if (score === this.score1)
       if (score >= 10)
         Render.drawText(
           "#fff",
           9,
-          "30px Arial",
+          30,
+          "Arial",
           this.screenSize.width / 2 - 30,
           40
         );
@@ -93,7 +104,8 @@ export class Pong {
         Render.drawText(
           "#fff",
           score,
-          "30px Arial",
+          30,
+          "Arial",
           this.screenSize.width / 2 - 30,
           40
         );
@@ -102,7 +114,8 @@ export class Pong {
         Render.drawText(
           "#fff",
           9,
-          "30px Arial",
+          30,
+          "Arial",
           this.screenSize.width / 2 + 30,
           40
         );
@@ -110,7 +123,8 @@ export class Pong {
         Render.drawText(
           "#fff",
           score,
-          "30px Arial",
+          30,
+          "Arial",
           this.screenSize.width / 2 + 30,
           40
         );
@@ -128,12 +142,13 @@ export class Pong {
    */
   loop = () => {
     requestAnimationFrame(this.loop);
-    this.dimension.clearRect(
-      0,
-      0,
-      this.screenSize.width,
-      this.screenSize.height
-    );
+    // this.dimension.clearRect(
+    //   0,
+    //   0,
+    //   this.screenSize.width,
+    //   this.screenSize.height
+    // );
+    Render.clearRectangle(this.screenSize.width, this.screenSize.height);
     this.play();
     this.show();
   };
