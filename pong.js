@@ -14,10 +14,10 @@ export class Pong {
 
     this.score1 = 0;
     this.score2 = 0;
-    this.paddleWidth = 10 * window.devicePixelRatio;
-    this.paddleHeight = 50 * window.devicePixelRatio;
-    this.radius = 5 * window.devicePixelRatio;
-    this.velocity = 5 * window.devicePixelRatio;
+    this.paddleWidth = 10;
+    this.paddleHeight = 100;
+    this.radius = 8;
+    this.velocity = 10;
     this.keys = {};
 
     // Left paddle
@@ -31,7 +31,7 @@ export class Pong {
 
     // Right paddle
     this.paddle2 = new Paddle(
-      this.screenSize.width - this.paddleWidth + 3,
+      this.screenSize.width - this.paddleWidth,
       this.screenSize.height / 2 - this.paddleHeight,
       this.paddleWidth,
       this.paddleHeight,
@@ -53,18 +53,15 @@ export class Pong {
    * Score checks whether ball reached either end and adds to score accordingly. It also resets the ball after
    */
   score() {
-    if (this.ball.x - this.ball.radius < -5 * window.devicePixelRatio) {
+    if (this.ball.x - this.ball.radius < -5) {
       this.score2++;
-      this.velocity = 5 * window.devicePixelRatio;
-      this.ball.velocity = 5 * window.devicePixelRatio;
+      this.velocity = 10;
+      this.ball.velocity = 10;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
-    } else if (
-      this.ball.x + this.ball.radius >
-      this.screenSize.width + 5 * window.devicePixelRatio
-    ) {
+    } else if (this.ball.x + this.ball.radius > this.screenSize.width + 5) {
       this.score1++;
-      this.velocity = 5 * window.devicePixelRatio;
-      this.ball.velocity = 5 * window.devicePixelRatio;
+      this.velocity = 10;
+      this.ball.velocity = 10;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
     }
   }
@@ -75,65 +72,72 @@ export class Pong {
    *
    */
   displayScore(dim, score) {
+    // Center line
     Render.drawRectangle(
       "#fff",
-      this.screenSize.width / 2,
-      0,
-      3 * window.devicePixelRatio,
-      this.screenSize.height
-    ); // Center line
-    Render.drawText(
-      "#fff",
-      "INCREASE SPEED: [f]",
-      10,
-      "Arial",
-      15 * window.devicePixelRatio,
-      15 * window.devicePixelRatio
+      5,
+      this.screenSize.height,
+      this.screenSize.width / 2 + 11.5,
+      0
     );
+    Render.drawText("#fff", "INCREASE SPEED: [f]", 20, "Arial", 25, 25);
     if (score === this.score1)
       if (score >= 10)
         Render.drawText(
           "#fff",
           9,
-          30,
+          50,
           "Arial",
           this.screenSize.width / 2 - 30,
-          40
+          45
         );
       else
         Render.drawText(
           "#fff",
           score,
-          30,
+          50,
           "Arial",
           this.screenSize.width / 2 - 30,
-          40
+          45
         );
     if (score === this.score2)
       if (score >= 10)
         Render.drawText(
           "#fff",
           9,
-          30,
+          50,
           "Arial",
           this.screenSize.width / 2 + 30,
-          40
+          45
         );
       else
         Render.drawText(
           "#fff",
           score,
-          30,
+          50,
           "Arial",
           this.screenSize.width / 2 + 30,
-          40
+          45
         );
     if (this.score1 >= 10 || this.score2 >= 10) {
       // Win feature -- add win string ("PLAYER _ WINS!") and delay restart
+      let winX =
+        this.score1 >= 10
+          ? this.screenSize.width / 2 - 475
+          : this.screenSize.width / 2 + 100;
+      let player = this.score1 >= 10 ? "PLAYER 1" : "PLAYER 2";
+      Render.drawText(
+        "fff",
+        player + " WINS!",
+        50,
+        "Arial",
+        winX,
+        this.screenSize.height - 100
+      );
       setTimeout(() => {
         this.score1 = 0;
         this.score2 = 0;
-      }, 1000);
+      }, 2000);
     }
   }
 
@@ -167,9 +171,9 @@ export class Pong {
 
   play() {
     // Speed feature
-    if (this.keys["f"] && this.ball.velocity <= 15 && this.velocity <= 10) {
-      this.ball.velocity += 0.25;
-      this.velocity += 0.125;
+    if (this.keys["f"] && this.ball.velocity <= 30 && this.velocity <= 20) {
+      this.ball.velocity += 1;
+      this.velocity += 0.5;
     }
     // Move player 1
     if (this.paddle1.y > 0 && this.keys["w"])
