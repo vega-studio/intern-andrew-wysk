@@ -18,10 +18,28 @@ export class Pong {
     this.paddleHeight = 100;
     this.radius = 8;
     this.velocity = 10;
+    this.activeAI = false;
     this.keys = {};
 
+    // Power up balls
+    this.chaosPowerUp = new Ball(
+      this.screenSize.width / 2 + 14,
+      this.screenSize.height / 2 + 120,
+      30,
+      0,
+      "#ff00ff"
+    );
+    this.speedPowerUp = new Ball(
+      this.screenSize.width / 2 + 14,
+      this.screenSize.height / 2 - 120,
+      30,
+      0,
+      "#ff0"
+    );
+
+    // The loseReactionTime variable makes AI slower when there is chaos
+    this.loseReactionTime = 0;
     this.chaosBalls = [];
-    this.ballColor = "#f00";
 
     // Left paddle
     this.paddle1 = new Paddle(
@@ -46,7 +64,7 @@ export class Pong {
       this.screenSize.height / 2,
       this.radius,
       this.velocity,
-      this.ballColor
+      "#f00"
     );
 
     this.initGame();
@@ -58,31 +76,9 @@ export class Pong {
   score() {
     if (this.ball.x - this.ball.radius < -5) {
       this.score2++;
-      for (let i = 0; i < 50; i++) {
-        this.chaosBalls.push(
-          new Ball(
-            this.screenSize.width * Math.random(),
-            this.screenSize.height * Math.random(),
-            this.radius,
-            this.velocity,
-            this.ballColor
-          )
-        );
-      }
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
     } else if (this.ball.x + this.ball.radius > this.screenSize.width + 5) {
       this.score1++;
-      for (let i = 0; i < 50; i++) {
-        this.chaosBalls.push(
-          new Ball(
-            this.screenSize.width * Math.random(),
-            this.screenSize.height * Math.random(),
-            this.radius,
-            this.velocity,
-            this.ballColor
-          )
-        );
-      }
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
     }
   }
@@ -101,8 +97,25 @@ export class Pong {
       this.screenSize.width / 2 + 11.5,
       0
     );
-    Render.drawText("#fff", "INCREASE SPEED: [f]", 20, "Arial", 25, 25);
-    Render.drawText("#fff", "CLEAR CHAOS BALLS: [c]", 20, "Arial", 25, 50);
+    Render.drawText("#fff", "PLAY AGAINST AI: [a]", 20, "Arial", 25, 25);
+    Render.drawText("#fff", "INCREASE SPEED: [f]", 20, "Arial", 25, 50);
+    Render.drawText(
+      "#fff",
+      "HIT YELLOW SPHERE FOR PADDLE SPEED",
+      20,
+      "Arial",
+      25,
+      75
+    );
+    Render.drawText(
+      "#fff",
+      "HIT PURPLE SPHERE FOR CHAOS ON YOUR OPPONENT'S SIDE",
+      20,
+      "Arial",
+      25,
+      100
+    );
+    // Render.drawText("#fff", "CLEAR CHAOS BALLS: [c]", 20, "Arial", 25, 50);
     if (score === this.score1)
       if (score >= 10)
         Render.drawText(
@@ -142,6 +155,7 @@ export class Pong {
           45
         );
     if (this.score1 >= 10 || this.score2 >= 10) {
+      this.loseReactionTime = 0;
       this.chaosBalls = [];
       this.velocity = 10;
       this.ball.velocity = 10;
@@ -164,7 +178,7 @@ export class Pong {
       setTimeout(() => {
         this.score1 = 0;
         this.score2 = 0;
-      }, 2000);
+      }, 1500);
     }
   }
 
@@ -191,35 +205,99 @@ export class Pong {
   }
 
   play() {
-    // Chaos feature
-    if (this.keys["c"]) this.chaosBalls = [];
+    // Power Ups
+
+    if (
+      this.ball.x >= this.chaosPowerUp.x - this.chaosPowerUp.radius &&
+      this.ball.x <= this.chaosPowerUp.x + this.chaosPowerUp.radius &&
+      this.ball.y >= this.chaosPowerUp.y - this.chaosPowerUp.radius &&
+      this.ball.y <= this.chaosPowerUp.y + this.chaosPowerUp.radius
+    ) {
+      if (this.ball.color === "#f00") {
+        this.loseReactionTime += 25;
+        for (let i = 0; i < 50; i++) {
+          this.chaosBalls.push(
+            new Ball(
+              (this.screenSize.width / 2) * Math.random(),
+              this.screenSize.height * Math.random(),
+              this.radius,
+              this.velocity,
+              "#f00"
+            )
+          );
+        }
+      } else {
+        for (let i = 0; i < 50; i++) {
+          this.chaosBalls.push(
+            new Ball(
+              (this.screenSize.width / 2) * Math.random() +
+                this.screenSize.width / 2,
+              this.screenSize.height * Math.random(),
+              this.radius,
+              this.velocity,
+              "#00f"
+            )
+          );
+        }
+      }
+    }
+    if (
+      this.ball.x >= this.speedPowerUp.x - this.speedPowerUp.radius &&
+      this.ball.x <= this.speedPowerUp.x + this.speedPowerUp.radius &&
+      this.ball.y >= this.speedPowerUp.y - this.speedPowerUp.radius &&
+      this.ball.y <= this.speedPowerUp.y + this.speedPowerUp.radius
+    ) {
+      if (this.ball.color === "#00f") {
+        if (this.paddle1.velocity <= 20) this.paddle1.velocity += 2;
+      } else {
+        if (this.paddle1.velocity <= 20) this.paddle2.velocity += 2;
+      }
+    }
+    // Chaos random direction
     for (let i = 0; i < this.chaosBalls.length; i++) {
       this.chaosBalls[i].theta = Math.random() * 2 * Math.PI;
     }
     // Speed feature
-    if (this.keys["f"] && this.ball.velocity <= 20 && this.velocity <= 15) {
-      this.ball.velocity += 1;
-      this.velocity += 0.5;
+    if (this.keys["f"] && this.ball.velocity <= 15) {
+      this.ball.velocity += 0.5;
     }
     // Move player 1
     if (this.paddle1.y > 0 && this.keys["w"])
-      this.paddle1.yChange = -this.velocity;
+      this.paddle1.yChange = -this.paddle1.velocity;
     else if (
       this.paddle1.y + this.paddle1.height < this.screenSize.height &&
       this.keys["s"]
     )
-      this.paddle1.yChange = this.velocity;
+      this.paddle1.yChange = this.paddle1.velocity;
     else this.paddle1.yChange = 0;
 
     // Move player 2
-    if (this.paddle2.y > 0 && this.keys["ArrowUp"])
-      this.paddle2.yChange = -this.velocity;
-    else if (
-      this.paddle2.y + this.paddle2.height < this.screenSize.height &&
-      this.keys["ArrowDown"]
-    )
-      this.paddle2.yChange = this.velocity;
-    else this.paddle2.yChange = 0;
+    // AI feature
+    if (this.keys["a"]) this.activeAI = true;
+    if (this.activeAI) {
+      if (this.ball.x > this.screenSize.width / 2 + this.loseReactionTime) {
+        if (
+          this.paddle2.y > 0 &&
+          this.ball.y < this.paddle2.y + this.paddle2.height / 2
+        )
+          this.paddle2.yChange = -this.paddle2.velocity;
+        else if (
+          this.paddle2.y + this.paddle2.height < this.screenSize.height &&
+          this.ball.y > this.paddle2.y + this.paddle2.height / 2
+        )
+          this.paddle2.yChange = this.paddle2.velocity;
+        else this.paddle2.yChange = 0;
+      } else this.paddle2.yChange = 0;
+    } else {
+      if (this.paddle2.y > 0 && this.keys["ArrowUp"])
+        this.paddle2.yChange = -this.velocity;
+      else if (
+        this.paddle2.y + this.paddle2.height < this.screenSize.height &&
+        this.keys["ArrowDown"]
+      )
+        this.paddle2.yChange = this.velocity;
+      else this.paddle2.yChange = 0;
+    }
 
     // Position the player according to their newly set velocities
 
@@ -244,7 +322,6 @@ export class Pong {
         (Math.random() * (2 * Math.PI + Math.PI / 3 - (5 * Math.PI) / 3) +
           (5 * Math.PI) / 3) %
         (2 * Math.PI);
-      this.ballColor = "#00f";
       this.ball.color = "#00f";
     } else if (
       this.ball.x + this.ball.radius >= this.paddle2.x &&
@@ -254,7 +331,6 @@ export class Pong {
       this.ball.theta =
         Math.random() * ((4 * Math.PI) / 3 - (2 * Math.PI) / 3) +
         (2 * Math.PI) / 3;
-      this.ballColor = "#f00";
       this.ball.color = "#f00";
     }
 
@@ -262,7 +338,15 @@ export class Pong {
 
     this.ball.position();
     for (let i = 0; i < this.chaosBalls.length; i++) {
-      this.chaosBalls[i].position();
+      if (
+        !(
+          this.chaosBalls[i].x > this.screenSize.width / 2 - 30 &&
+          this.chaosBalls[i].x < this.screenSize.width / 2 + 30
+        )
+      )
+        this.chaosBalls[i].position();
+      else if (this.chaosBalls[i].color === "#f00") this.chaosBalls[i].x -= 50;
+      else if (this.chaosBalls[i].color === "#00f") this.chaosBalls[i].x += 50;
     }
 
     // Calculate score
@@ -273,13 +357,18 @@ export class Pong {
    * Render our game board
    */
   show() {
-    this.paddle1.show(this.dimension);
-    this.paddle2.show(this.dimension);
-    this.ball.show(this.dimension);
+    // Scoring system behind everything else
+    this.displayScore(this.dimension, this.score1);
+    this.displayScore(this.dimension, this.score2);
+
+    // Objects have priority (appear over everything else)
     for (let i = 0; i < this.chaosBalls.length; i++) {
       this.chaosBalls[i].show(this.dimension);
     }
-    this.displayScore(this.dimension, this.score1);
-    this.displayScore(this.dimension, this.score2);
+    this.chaosPowerUp.show(this.dimension);
+    this.speedPowerUp.show(this.dimension);
+    this.ball.show(this.dimension);
+    this.paddle1.show(this.dimension);
+    this.paddle2.show(this.dimension);
   }
 }
