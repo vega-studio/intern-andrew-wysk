@@ -20,6 +20,9 @@ export class Pong {
     this.velocity = 10;
     this.keys = {};
 
+    this.chaosBalls = [];
+    this.ballColor = "#f00";
+
     // Left paddle
     this.paddle1 = new Paddle(
       0,
@@ -43,7 +46,7 @@ export class Pong {
       this.screenSize.height / 2,
       this.radius,
       this.velocity,
-      "#f00"
+      this.ballColor
     );
 
     this.initGame();
@@ -55,13 +58,31 @@ export class Pong {
   score() {
     if (this.ball.x - this.ball.radius < -5) {
       this.score2++;
-      this.velocity = 10;
-      this.ball.velocity = 10;
+      for (let i = 0; i < 50; i++) {
+        this.chaosBalls.push(
+          new Ball(
+            this.screenSize.width * Math.random(),
+            this.screenSize.height * Math.random(),
+            this.radius,
+            this.velocity,
+            this.ballColor
+          )
+        );
+      }
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
     } else if (this.ball.x + this.ball.radius > this.screenSize.width + 5) {
       this.score1++;
-      this.velocity = 10;
-      this.ball.velocity = 10;
+      for (let i = 0; i < 50; i++) {
+        this.chaosBalls.push(
+          new Ball(
+            this.screenSize.width * Math.random(),
+            this.screenSize.height * Math.random(),
+            this.radius,
+            this.velocity,
+            this.ballColor
+          )
+        );
+      }
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
     }
   }
@@ -81,6 +102,7 @@ export class Pong {
       0
     );
     Render.drawText("#fff", "INCREASE SPEED: [f]", 20, "Arial", 25, 25);
+    Render.drawText("#fff", "CLEAR CHAOS BALLS: [c]", 20, "Arial", 25, 50);
     if (score === this.score1)
       if (score >= 10)
         Render.drawText(
@@ -120,14 +142,19 @@ export class Pong {
           45
         );
     if (this.score1 >= 10 || this.score2 >= 10) {
+      this.chaosBalls = [];
+      this.velocity = 10;
+      this.ball.velocity = 10;
       // Win feature -- add win string ("PLAYER _ WINS!") and delay restart
       let winX =
         this.score1 >= 10
           ? this.screenSize.width / 2 - 475
           : this.screenSize.width / 2 + 100;
       let player = this.score1 >= 10 ? "PLAYER 1" : "PLAYER 2";
+      if (this.score1 >= 10) this.score2 = 0;
+      else this.score1 = 0;
       Render.drawText(
-        "fff",
+        "#fff",
         player + " WINS!",
         50,
         "Arial",
@@ -146,12 +173,6 @@ export class Pong {
    */
   loop = () => {
     requestAnimationFrame(this.loop);
-    // this.dimension.clearRect(
-    //   0,
-    //   0,
-    //   this.screenSize.width,
-    //   this.screenSize.height
-    // );
     Render.clearRectangle(this.screenSize.width, this.screenSize.height);
     this.play();
     this.show();
@@ -170,8 +191,13 @@ export class Pong {
   }
 
   play() {
+    // Chaos feature
+    if (this.keys["c"]) this.chaosBalls = [];
+    for (let i = 0; i < this.chaosBalls.length; i++) {
+      this.chaosBalls[i].theta = Math.random() * 2 * Math.PI;
+    }
     // Speed feature
-    if (this.keys["f"] && this.ball.velocity <= 30 && this.velocity <= 20) {
+    if (this.keys["f"] && this.ball.velocity <= 20 && this.velocity <= 15) {
       this.ball.velocity += 1;
       this.velocity += 0.5;
     }
@@ -194,11 +220,11 @@ export class Pong {
     )
       this.paddle2.yChange = this.velocity;
     else this.paddle2.yChange = 0;
+
     // Position the player according to their newly set velocities
+
     this.paddle1.position();
     this.paddle2.position();
-
-    // Position the ball according to it's current state
 
     if (
       // Ceiling bounce
@@ -218,6 +244,7 @@ export class Pong {
         (Math.random() * (2 * Math.PI + Math.PI / 3 - (5 * Math.PI) / 3) +
           (5 * Math.PI) / 3) %
         (2 * Math.PI);
+      this.ballColor = "#00f";
       this.ball.color = "#00f";
     } else if (
       this.ball.x + this.ball.radius >= this.paddle2.x &&
@@ -227,17 +254,18 @@ export class Pong {
       this.ball.theta =
         Math.random() * ((4 * Math.PI) / 3 - (2 * Math.PI) / 3) +
         (2 * Math.PI) / 3;
+      this.ballColor = "#f00";
       this.ball.color = "#f00";
     }
-    // Change color every bounce
-    // Reflect the angle: straight from chat gpt
-    //   const deltaY = this.ball.y - (this.paddle1.y + this.paddle1.height / 2);
-    //   const normalizedDeltaY = deltaY / (this.paddle1.height / 2);
-    //   const maxReflectionAngle = Math.PI / 3;
-    //   const reflectionAngle = normalizedDeltaY * maxReflectionAngle;
-    //   this.ball.theta = (Math.PI - this.ball.theta + 2 * reflectionAngle) * -1;
-    // }
+
+    // Position the ball according to it's current state
+
     this.ball.position();
+    for (let i = 0; i < this.chaosBalls.length; i++) {
+      this.chaosBalls[i].position();
+    }
+
+    // Calculate score
     this.score();
   }
 
@@ -248,6 +276,9 @@ export class Pong {
     this.paddle1.show(this.dimension);
     this.paddle2.show(this.dimension);
     this.ball.show(this.dimension);
+    for (let i = 0; i < this.chaosBalls.length; i++) {
+      this.chaosBalls[i].show(this.dimension);
+    }
     this.displayScore(this.dimension, this.score1);
     this.displayScore(this.dimension, this.score2);
   }
