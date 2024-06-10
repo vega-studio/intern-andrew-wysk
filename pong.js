@@ -1,6 +1,7 @@
 import { Paddle } from "./paddle.js";
 import { Ball } from "./ball.js";
 import { Render } from "./render.js";
+import { ChaosBall } from "./power-ups/chaos-balls.js";
 
 export class Pong {
   constructor(canvasId) {
@@ -222,7 +223,6 @@ export class Pong {
 
   play() {
     // Power Ups
-
     if (
       this.ball.x >= this.chaosPowerUp.x - this.chaosPowerUp.radius &&
       this.ball.x <= this.chaosPowerUp.x + this.chaosPowerUp.radius &&
@@ -342,8 +342,8 @@ export class Pong {
     this.paddle1.position();
     this.paddle2.position();
 
+    // Ceiling bounce
     if (
-      // Ceiling bounce
       this.ball.y - this.ball.radius <= 0 ||
       this.ball.y + this.ball.radius >= this.screenSize.height
     ) {
@@ -387,17 +387,18 @@ export class Pong {
     }
 
     // Position the ball according to it's current state
-
     this.ball.position();
+
     for (let i = 0; i < this.chaosBalls.length; i++) {
       if (
         !(
           this.chaosBalls[i].x > this.screenSize.width / 2 - 30 &&
           this.chaosBalls[i].x < this.screenSize.width / 2 + 30
         )
-      )
+      ) {
         this.chaosBalls[i].position();
-      else if (this.chaosBalls[i].color === "#f00") this.chaosBalls[i].x -= 50;
+      } else if (this.chaosBalls[i].color === "#f00")
+        this.chaosBalls[i].x -= 50;
       else if (this.chaosBalls[i].color === "#00f") this.chaosBalls[i].x += 50;
     }
 
