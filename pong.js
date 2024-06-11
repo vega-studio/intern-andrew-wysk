@@ -1,7 +1,8 @@
 import { Paddle } from "./paddle.js";
 import { Ball } from "./ball.js";
 import { Render } from "./render.js";
-import { ChaosBall } from "./power-ups/chaos-balls.js";
+import { ChaosBall } from "../power-ups/chaos-ball.js";
+import { SpeedBall } from "../power-ups/speed-ball.js";
 
 export class Pong {
   constructor(canvasId) {
@@ -23,24 +24,18 @@ export class Pong {
     this.keys = {};
 
     // Power up balls
-    this.chaosPowerUp = new Ball(
+    this.chaosPowerUp = new ChaosBall(
       this.screenSize.width / 2 + 14,
       this.screenSize.height / 2 + 120,
       30,
-      0,
       "#ff00ff"
     );
-    this.speedPowerUp = new Ball(
+    this.speedPowerUp = new SpeedBall(
       this.screenSize.width / 2 + 14,
       this.screenSize.height / 2 - 120,
       30,
-      0,
       "#ff0"
     );
-
-    // The loseReactionTime variable makes AI slower when there is chaos
-    this.loseReactionTime = 0;
-    this.chaosBalls = [];
 
     // Left paddle
     this.paddle1 = new Paddle(
@@ -80,7 +75,7 @@ export class Pong {
       this.ball.velocity = 10;
       this.paddle1.velocity = 10;
       this.paddle2.velocity = 10;
-      this.chaosBalls = [];
+      this.chaosPowerUp.balls = [];
       this.loseReactionTime = 0;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
     } else if (this.ball.x + this.ball.radius > this.screenSize.width + 5) {
@@ -88,7 +83,7 @@ export class Pong {
       this.ball.velocity = 10;
       this.paddle1.velocity = 10;
       this.paddle2.velocity = 10;
-      this.chaosBalls = [];
+      this.chaosPowerUp.balls = [];
       this.loseReactionTime = 0;
       if (
         this.paddle2.y + this.paddle2.height / 2 <
@@ -136,7 +131,6 @@ export class Pong {
       25,
       100
     );
-    // Render.drawText("#fff", "CLEAR CHAOS BALLS: [c]", 20, "Arial", 25, 50);
     if (score === this.score1)
       if (score >= 10)
         Render.drawText(
@@ -203,10 +197,10 @@ export class Pong {
    * Game loop that updates frames
    */
   loop = () => {
-    requestAnimationFrame(this.loop);
     Render.clearRectangle(this.screenSize.width, this.screenSize.height);
     this.play();
     this.show();
+    requestAnimationFrame(this.loop);
   };
 
   initGame() {
@@ -223,56 +217,30 @@ export class Pong {
 
   play() {
     // Power Ups
-    if (
-      this.ball.x >= this.chaosPowerUp.x - this.chaosPowerUp.radius &&
-      this.ball.x <= this.chaosPowerUp.x + this.chaosPowerUp.radius &&
-      this.ball.y >= this.chaosPowerUp.y - this.chaosPowerUp.radius &&
-      this.ball.y <= this.chaosPowerUp.y + this.chaosPowerUp.radius
-    ) {
-      if (this.ball.color === "#f00") {
-        for (let i = 0; i < 200; i++) {
-          this.chaosBalls.push(
-            new Ball(
-              (this.screenSize.width / 2) * Math.random(),
-              this.screenSize.height * Math.random(),
-              this.radius,
-              this.velocity,
-              "#f00"
-            )
-          );
-        }
-      } else {
-        this.loseReactionTime += 200;
-        for (let i = 0; i < 200; i++) {
-          this.chaosBalls.push(
-            new Ball(
-              (this.screenSize.width / 2) * Math.random() +
-                this.screenSize.width / 2,
-              this.screenSize.height * Math.random(),
-              this.radius,
-              this.velocity,
-              "#00f"
-            )
-          );
-        }
-      }
+    // Chaos logic
+    this.chaosPowerUp.play();
+    // Gives chaos balls random direction
+    for (let i = 0; i < this.chaosPowerUp.balls.length; i++) {
+      this.chaosPowerUp.balls[i].theta = Math.random() * 2 * Math.PI;
     }
-    if (
-      this.ball.x >= this.speedPowerUp.x - this.speedPowerUp.radius &&
-      this.ball.x <= this.speedPowerUp.x + this.speedPowerUp.radius &&
-      this.ball.y >= this.speedPowerUp.y - this.speedPowerUp.radius &&
-      this.ball.y <= this.speedPowerUp.y + this.speedPowerUp.radius
-    ) {
-      if (this.ball.color === "#00f") {
-        if (this.paddle1.velocity <= 20) this.paddle1.velocity += 2;
-      } else {
-        if (this.paddle1.velocity <= 20) this.paddle2.velocity += 2;
-      }
+
+    // Makes barrier for chaos balls so they don't cross center line
+    for (let i = 0; i < this.chaosPowerUp.balls.length; i++) {
+      if (
+        !(
+          this.chaosPowerUp.balls[i].x > this.screenSize.width / 2 - 30 &&
+          this.chaosPowerUp.balls[i].x < this.screenSize.width / 2 + 30
+        )
+      ) {
+        this.chaosPowerUp.balls[i].position();
+      } else if (this.chaosPowerUp.balls[i].color === "#f00")
+        this.chaosPowerUp.balls[i].x -= 50;
+      else if (this.chaosPowerUp.balls[i].color === "#00f")
+        this.chaosPowerUp.balls[i].x += 50;
     }
+    // Speed logic
+    this.speedPowerUp.play();
     // Chaos random direction
-    for (let i = 0; i < this.chaosBalls.length; i++) {
-      this.chaosBalls[i].theta = Math.random() * 2 * Math.PI;
-    }
     // Move player 1
     if (this.paddle1.y > 0 && this.keys["w"])
       this.paddle1.yChange = -this.paddle1.velocity;
@@ -388,20 +356,6 @@ export class Pong {
 
     // Position the ball according to it's current state
     this.ball.position();
-
-    for (let i = 0; i < this.chaosBalls.length; i++) {
-      if (
-        !(
-          this.chaosBalls[i].x > this.screenSize.width / 2 - 30 &&
-          this.chaosBalls[i].x < this.screenSize.width / 2 + 30
-        )
-      ) {
-        this.chaosBalls[i].position();
-      } else if (this.chaosBalls[i].color === "#f00")
-        this.chaosBalls[i].x -= 50;
-      else if (this.chaosBalls[i].color === "#00f") this.chaosBalls[i].x += 50;
-    }
-
     // Calculate score
     this.score();
   }
@@ -414,9 +368,9 @@ export class Pong {
     this.displayScore(this.dimension, this.score1);
     this.displayScore(this.dimension, this.score2);
 
-    // Objects have priority (appear over everything else)
-    for (let i = 0; i < this.chaosBalls.length; i++) {
-      this.chaosBalls[i].show(this.dimension);
+    // Objects have priority (appear over e verything else)
+    for (let i = 0; i < this.chaosPowerUp.balls.length; i++) {
+      this.chaosPowerUp.balls[i].show(this.dimension);
     }
     this.chaosPowerUp.show(this.dimension);
     this.speedPowerUp.show(this.dimension);
