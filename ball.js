@@ -19,6 +19,7 @@ export class Ball {
   reset(w, h) {
     this.x = w;
     this.y = h;
+    this.radius = 8;
     this.isLeft = !this.isLeft;
     if (this.isLeft) this.theta = Math.PI;
     else this.theta = Math.PI * 2;

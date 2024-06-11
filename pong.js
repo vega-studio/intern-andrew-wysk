@@ -3,6 +3,10 @@ import { Ball } from "./ball.js";
 import { Render } from "./render.js";
 import { ChaosBall } from "../power-ups/chaos-ball.js";
 import { SpeedBall } from "../power-ups/speed-ball.js";
+import { LengthBall } from "../power-ups/length-ball.js";
+import { GrowBall } from "../power-ups/grow-ball.js";
+import { PaddleColorBall } from "../power-ups/paddle-color-ball.js";
+import { ShrinkBall } from "../power-ups/shrink-ball.js";
 
 export class Pong {
   constructor(canvasId) {
@@ -24,20 +28,54 @@ export class Pong {
     this.keys = {};
 
     // Power up balls
+    // Chaos: Red
+    // Speed: Orange
+    // Length: Yellow
+    // Grow: Green
+    // PaddleColor: Blue
+    // Shrink: Magenta
     this.powerUpBalls = [
       new ChaosBall(
         this,
         this.screenSize.width / 2 + 14,
-        this.screenSize.height / 2 + 120,
+        this.screenSize.height / 2 - 300,
         30,
-        "#ff00ff"
+        "#f00"
       ),
       new SpeedBall(
         this,
         this.screenSize.width / 2 + 14,
-        this.screenSize.height / 2 - 120,
+        this.screenSize.height / 2 - 200,
+        30,
+        "#ffa500"
+      ),
+      new LengthBall(
+        this,
+        this.screenSize.width / 2 + 14,
+        this.screenSize.height / 2 - 100,
         30,
         "#ff0"
+      ),
+      new GrowBall(
+        this,
+        this.screenSize.width / 2 + 14,
+        this.screenSize.height / 2 + 100,
+        30,
+        "#0f0"
+      ),
+      new PaddleColorBall(
+        this,
+        this.screenSize.width / 2 + 14,
+        this.screenSize.height / 2 + 200,
+        30,
+        "#00f"
+      ),
+      new ShrinkBall(
+        this,
+        this.screenSize.width / 2 + 14,
+        this.screenSize.height / 2 + 300,
+        30,
+        "#f0f"
       ),
     ];
 
@@ -47,7 +85,8 @@ export class Pong {
       this.screenSize.height / 2 - this.paddleHeight,
       this.paddleWidth,
       this.paddleHeight,
-      this.velocity
+      this.velocity,
+      "#fff"
     );
 
     // Right paddle
@@ -56,7 +95,8 @@ export class Pong {
       this.screenSize.height / 2 - this.paddleHeight,
       this.paddleWidth,
       this.paddleHeight,
-      this.velocity
+      this.velocity,
+      "#fff"
     );
 
     this.ball = new Ball(
@@ -82,6 +122,8 @@ export class Pong {
       this.powerUpBalls[0].balls = [];
       this.loseReactionTime = 0;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
+      this.paddle1.reset();
+      this.paddle2.reset();
     } else if (this.ball.x + this.ball.radius > this.screenSize.width + 5) {
       this.score1++;
       this.ball.velocity = 10;
@@ -100,6 +142,8 @@ export class Pong {
       )
         this.paddle2.y -= this.paddle2.velocity;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
+      this.paddle1.reset();
+      this.paddle2.reset();
     }
   }
 
@@ -117,23 +161,55 @@ export class Pong {
       this.screenSize.width / 2 + 11.5,
       0
     );
-    Render.drawText("#fff", "PLAY AGAINST AI: [a]", 20, "Arial", 25, 25);
-    Render.drawText("#fff", "TURN OFF AI: [o]", 20, "Arial", 25, 50);
+    Render.drawText("#fff", "1) PLAY AGAINST AI: [a]", 12.5, "Arial", 25, 15);
+    Render.drawText("#fff", "2) TURN OFF AI: [o]", 12.5, "Arial", 25, 30);
     Render.drawText(
       "#fff",
-      "HIT YELLOW SPHERE FOR PADDLE SPEED",
-      20,
+      "3) RED BALL: HIT TO CREATE CHAOS ON YOUR OPPONENT'S SIDE",
+      12.5,
+      "Arial",
+      25,
+      45
+    );
+    Render.drawText(
+      "#fff",
+      "4) ORANGE BALL: HIT TO INCREASE YOUR PADDLE SPEED",
+      12.5,
+      "Arial",
+      25,
+      60
+    );
+    Render.drawText(
+      "#fff",
+      "5) YELLOW BALL: HIT TO INCREASE YOUR PADDLE'S LENGTH",
+      12.5,
       "Arial",
       25,
       75
     );
     Render.drawText(
       "#fff",
-      "HIT PURPLE SPHERE FOR CHAOS ON YOUR OPPONENT'S SIDE",
-      20,
+      "6) GREEN BALL: HIT TO GROW THE BALL",
+      12.5,
       "Arial",
       25,
-      100
+      90
+    );
+    Render.drawText(
+      "#fff",
+      "7) BLUE BALL: HIT TO ENHANCE YOUR PADDLE'S COLOR",
+      12.5,
+      "Arial",
+      25,
+      105
+    );
+    Render.drawText(
+      "#fff",
+      "8) PURPLE BALL: HIT TO SHRINK THE BALL",
+      12.5,
+      "Arial",
+      25,
+      120
     );
     if (score === this.score1)
       if (score >= 10)
@@ -222,7 +298,9 @@ export class Pong {
   play() {
     // Power Ups
     this.powerUpBalls.forEach((e) => {
-      e.play();
+      {
+        e.play();
+      }
     });
     // Gives chaos balls random direction
     for (let i = 0; i < this.powerUpBalls[0].balls.length; i++) {

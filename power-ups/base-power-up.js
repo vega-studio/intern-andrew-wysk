@@ -15,12 +15,13 @@ export class BasePowerUp {
    * @return {boolean} True if the ball hits this powerup
    */
   hitTest(ball) {
-    const point1 = [this.x, this.y];
-    const point2 = [ball.x, ball.y];
-    const dist =
-      Math.pow(Math.abs(point1[0] - point2[0]), 2) +
-      Math.pow(Math.abs(point1[1] - point2[1]), 2);
-    return dist * dist <= this.radius + ball.radius;
+    // const point1 = [this.x, this.y];
+    // const point2 = [ball.x, ball.y];
+    // const dist =
+    //   Math.pow(Math.abs(point1[0] - point2[0]), 2) +
+    //   Math.pow(Math.abs(point1[1] - point2[1]), 2);
+    // return dist * dist <= this.radius + ball.radius;
+    return this.pong.ball.y > this.pong.screenSize.width / 2;
   }
 
   play() {
