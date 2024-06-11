@@ -24,18 +24,22 @@ export class Pong {
     this.keys = {};
 
     // Power up balls
-    this.chaosPowerUp = new ChaosBall(
-      this.screenSize.width / 2 + 14,
-      this.screenSize.height / 2 + 120,
-      30,
-      "#ff00ff"
-    );
-    this.speedPowerUp = new SpeedBall(
-      this.screenSize.width / 2 + 14,
-      this.screenSize.height / 2 - 120,
-      30,
-      "#ff0"
-    );
+    this.powerUpBalls = [
+      new ChaosBall(
+        this,
+        this.screenSize.width / 2 + 14,
+        this.screenSize.height / 2 + 120,
+        30,
+        "#ff00ff"
+      ),
+      new SpeedBall(
+        this,
+        this.screenSize.width / 2 + 14,
+        this.screenSize.height / 2 - 120,
+        30,
+        "#ff0"
+      ),
+    ];
 
     // Left paddle
     this.paddle1 = new Paddle(
@@ -75,7 +79,7 @@ export class Pong {
       this.ball.velocity = 10;
       this.paddle1.velocity = 10;
       this.paddle2.velocity = 10;
-      this.chaosPowerUp.balls = [];
+      this.powerUpBalls[0].balls = [];
       this.loseReactionTime = 0;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
     } else if (this.ball.x + this.ball.radius > this.screenSize.width + 5) {
@@ -83,7 +87,7 @@ export class Pong {
       this.ball.velocity = 10;
       this.paddle1.velocity = 10;
       this.paddle2.velocity = 10;
-      this.chaosPowerUp.balls = [];
+      this.powerUpBalls[0].balls = [];
       this.loseReactionTime = 0;
       if (
         this.paddle2.y + this.paddle2.height / 2 <
@@ -217,30 +221,14 @@ export class Pong {
 
   play() {
     // Power Ups
-    // Chaos logic
-    this.chaosPowerUp.play();
+    this.powerUpBalls.forEach((e) => {
+      e.play();
+    });
     // Gives chaos balls random direction
-    for (let i = 0; i < this.chaosPowerUp.balls.length; i++) {
-      this.chaosPowerUp.balls[i].theta = Math.random() * 2 * Math.PI;
+    for (let i = 0; i < this.powerUpBalls[0].balls.length; i++) {
+      this.powerUpBalls[0].balls[i].theta = Math.random() * 2 * Math.PI;
     }
 
-    // Makes barrier for chaos balls so they don't cross center line
-    for (let i = 0; i < this.chaosPowerUp.balls.length; i++) {
-      if (
-        !(
-          this.chaosPowerUp.balls[i].x > this.screenSize.width / 2 - 30 &&
-          this.chaosPowerUp.balls[i].x < this.screenSize.width / 2 + 30
-        )
-      ) {
-        this.chaosPowerUp.balls[i].position();
-      } else if (this.chaosPowerUp.balls[i].color === "#f00")
-        this.chaosPowerUp.balls[i].x -= 50;
-      else if (this.chaosPowerUp.balls[i].color === "#00f")
-        this.chaosPowerUp.balls[i].x += 50;
-    }
-    // Speed logic
-    this.speedPowerUp.play();
-    // Chaos random direction
     // Move player 1
     if (this.paddle1.y > 0 && this.keys["w"])
       this.paddle1.yChange = -this.paddle1.velocity;
@@ -369,11 +357,12 @@ export class Pong {
     this.displayScore(this.dimension, this.score2);
 
     // Objects have priority (appear over e verything else)
-    for (let i = 0; i < this.chaosPowerUp.balls.length; i++) {
-      this.chaosPowerUp.balls[i].show(this.dimension);
+    for (let i = 0; i < this.powerUpBalls[0].balls.length; i++) {
+      this.powerUpBalls[0].balls[i].show(this.dimension);
     }
-    this.chaosPowerUp.show(this.dimension);
-    this.speedPowerUp.show(this.dimension);
+    this.powerUpBalls.forEach((e) => {
+      e.show(this.dimension);
+    });
     this.ball.show(this.dimension);
     this.paddle1.show(this.dimension);
     this.paddle2.show(this.dimension);

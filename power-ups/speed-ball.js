@@ -1,10 +1,8 @@
 import { BasePowerUp } from "./base-power-up.js";
-import { Index } from "../index.js";
 
 export class SpeedBall extends BasePowerUp {
-  constructor(x, y, radius) {
-    super(x, y, radius);
-    this.ball = Index.getGame().ball;
+  constructor(pong, x, y, radius, color) {
+    super(pong, x, y, radius, color);
   }
   /**
    * @param {Ball} ball The ball in play
@@ -19,11 +17,11 @@ export class SpeedBall extends BasePowerUp {
    * Logic loop for executing code on the game loop.
    */
   play() {
-    if (this.hitTest(this.ball)) {
-      if (this.ball.color === "#00f") {
-        if (this.paddle1.velocity <= 20) this.paddle1.velocity += 2;
+    if (this.hitTest(this.pong.ball)) {
+      if (this.pong.ball.color === "#00f") {
+        if (this.pong.paddle1.velocity <= 20) this.pong.paddle1.velocity += 2;
       } else {
-        if (this.paddle1.velocity <= 20) this.paddle2.velocity += 2;
+        if (this.pong.paddle1.velocity <= 20) this.pong.paddle2.velocity += 2;
       }
     }
   }
