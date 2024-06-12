@@ -6,7 +6,6 @@ export class ChaosBall extends BasePowerUp {
     // Place to store balls
     this.balls = [];
     // The loseReactionTime variable makes AI slower when there is chaos
-    this.loseReactionTime = 0;
   }
   /**
    * @param {Ball} ball The ball in play
@@ -36,7 +35,7 @@ export class ChaosBall extends BasePowerUp {
           );
         }
       } else {
-        this.loseReactionTime += 150;
+        this.pong.loseReactionTime += 150;
         for (let i = 0; i < 200; i++) {
           this.balls.push(
             new Ball(

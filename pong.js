@@ -24,8 +24,11 @@ export class Pong {
     this.paddleHeight = 100;
     this.radius = 8;
     this.velocity = 10;
-    this.activeAI = false;
+    this.activeAI1 = false;
+    this.activeAI2 = false;
     this.keys = {};
+    // Delay for AI when there is chaos
+    this.loseReactionTime = 0;
 
     // Power up balls
     // Chaos: Red
@@ -81,22 +84,26 @@ export class Pong {
 
     // Left paddle
     this.paddle1 = new Paddle(
+      this,
       0,
       this.screenSize.height / 2 - this.paddleHeight,
       this.paddleWidth,
       this.paddleHeight,
       this.velocity,
-      "#fff"
+      "#fff",
+      this.loseReactionTime
     );
 
     // Right paddle
     this.paddle2 = new Paddle(
+      this,
       this.screenSize.width - this.paddleWidth,
       this.screenSize.height / 2 - this.paddleHeight,
       this.paddleWidth,
       this.paddleHeight,
       this.velocity,
-      "#fff"
+      "#fff",
+      this.loseReactionTime
     );
 
     this.ball = new Ball(
@@ -161,19 +168,12 @@ export class Pong {
       this.screenSize.width / 2 + 11.5,
       0
     );
-    Render.drawText("#fff", "1) PLAY AGAINST AI: [a]", 12.5, "Arial", 25, 15);
-    Render.drawText("#fff", "2) TURN OFF AI: [o]", 12.5, "Arial", 25, 30);
+    Render.drawText("#fff", "1) MAKE PLAYER 1 AI: [1]", 12.5, "Arial", 25, 15);
+    Render.drawText("#fff", "2) MAKE PLAYER 2 AI: [2]", 12.5, "Arial", 25, 30);
+    Render.drawText("#fff", "3) TURN OFF ALL AI: [o]", 12.5, "Arial", 25, 45);
     Render.drawText(
       "#fff",
-      "3) RED BALL: HIT TO CREATE CHAOS ON YOUR OPPONENT'S SIDE",
-      12.5,
-      "Arial",
-      25,
-      45
-    );
-    Render.drawText(
-      "#fff",
-      "4) ORANGE BALL: HIT TO INCREASE YOUR PADDLE SPEED",
+      "4) RED BALL: HIT TO CREATE CHAOS ON YOUR OPPONENT'S SIDE",
       12.5,
       "Arial",
       25,
@@ -181,7 +181,7 @@ export class Pong {
     );
     Render.drawText(
       "#fff",
-      "5) YELLOW BALL: HIT TO INCREASE YOUR PADDLE'S LENGTH",
+      "5) ORANGE BALL: HIT TO INCREASE YOUR PADDLE SPEED",
       12.5,
       "Arial",
       25,
@@ -189,7 +189,7 @@ export class Pong {
     );
     Render.drawText(
       "#fff",
-      "6) GREEN BALL: HIT TO GROW THE BALL",
+      "6) YELLOW BALL: HIT TO INCREASE YOUR PADDLE'S LENGTH",
       12.5,
       "Arial",
       25,
@@ -197,7 +197,7 @@ export class Pong {
     );
     Render.drawText(
       "#fff",
-      "7) BLUE BALL: HIT TO ENHANCE YOUR PADDLE'S COLOR",
+      "7) GREEN BALL: HIT TO GROW THE BALL",
       12.5,
       "Arial",
       25,
@@ -205,11 +205,19 @@ export class Pong {
     );
     Render.drawText(
       "#fff",
-      "8) PURPLE BALL: HIT TO SHRINK THE BALL",
+      "8) BLUE BALL: HIT TO ENHANCE YOUR PADDLE'S COLOR",
       12.5,
       "Arial",
       25,
       120
+    );
+    Render.drawText(
+      "#fff",
+      "9) PURPLE BALL: HIT TO SHRINK THE BALL",
+      12.5,
+      "Arial",
+      25,
+      135
     );
     if (score === this.score1)
       if (score >= 10)
@@ -308,58 +316,31 @@ export class Pong {
     }
 
     // Move player 1
-    if (this.paddle1.y > 0 && this.keys["w"])
-      this.paddle1.yChange = -this.paddle1.velocity;
-    else if (
-      this.paddle1.y + this.paddle1.height < this.screenSize.height &&
-      this.keys["s"]
-    )
-      this.paddle1.yChange = this.paddle1.velocity;
-    else this.paddle1.yChange = 0;
+    if (this.keys["1"]) this.activeAI1 = true;
+
+    if (this.activeAI1) {
+      this.paddle1.positionAI(this.ball);
+      if (this.ball.color === "#00f") {
+        this.paddle1.relocateAI(this.ball);
+      }
+    } else {
+      if (this.paddle1.y > 0 && this.keys["w"])
+        this.paddle1.yChange = -this.paddle1.velocity;
+      else if (
+        this.paddle1.y + this.paddle1.height < this.screenSize.height &&
+        this.keys["s"]
+      )
+        this.paddle1.yChange = this.paddle1.velocity;
+      else this.paddle1.yChange = 0;
+    }
 
     // Move player 2
-    // AI feature
-    if (this.keys["a"]) this.activeAI = true;
-    if (this.keys["o"]) this.activeAI = false;
-    if (this.activeAI) {
-      if (
-        this.ball.x > this.screenSize.width / 2 + this.loseReactionTime &&
-        this.ball.color === "#00f"
-      ) {
-        if (
-          this.paddle2.y > 0 &&
-          this.ball.y < this.paddle2.y + this.paddle2.height / 2 &&
-          !(
-            this.ball.y > this.paddle2.y + 20 * Math.random() &&
-            this.ball.y <
-              this.paddle2.y + this.paddle2.height - 20 * Math.random()
-          )
-        )
-          this.paddle2.yChange = -this.paddle2.velocity;
-        else if (
-          this.paddle2.y + this.paddle2.height < this.screenSize.height &&
-          this.ball.y > this.paddle2.y + this.paddle2.height / 2 &&
-          !(
-            this.ball.y > this.paddle2.y + 20 * Math.random() &&
-            this.ball.y <
-              this.paddle2.y + this.paddle2.height - 20 * Math.random()
-          )
-        )
-          this.paddle2.yChange = this.paddle2.velocity;
-        else this.paddle2.yChange = 0;
-        // Relocate paddle to center
-      } else if (this.ball.color === "#f00") {
-        if (
-          this.paddle2.y + this.paddle2.height / 2 <
-          this.screenSize.height / 2 - 20
-        )
-          this.paddle2.y += this.paddle2.velocity;
-        if (
-          this.paddle2.y + this.paddle2.height / 2 >
-          this.screenSize.height / 2 + 20
-        )
-          this.paddle2.y -= this.paddle2.velocity;
-      } else this.paddle2.yChange = 0;
+    if (this.keys["2"]) this.activeAI2 = true;
+    if (this.activeAI2) {
+      this.paddle2.positionAI(this.ball);
+      if (this.ball.color === "#f00") {
+        this.paddle2.relocateAI(this.ball);
+      }
     } else {
       if (this.paddle2.y > 0 && this.keys["ArrowUp"])
         this.paddle2.yChange = -this.velocity;
@@ -369,6 +350,11 @@ export class Pong {
       )
         this.paddle2.yChange = this.velocity;
       else this.paddle2.yChange = 0;
+    }
+    // Turns off both AIs
+    if (this.keys["o"]) {
+      this.activeAI1 = false;
+      this.activeAI2 = false;
     }
 
     // Position the player according to their newly set velocities
