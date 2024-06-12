@@ -10,7 +10,7 @@ export class ShrinkBall extends BasePowerUp {
    * @return {boolean} True if the ball hits this powerup
    */
   hitTest(ball) {
-    super.hitTest(ball);
+    return super.hitTest(ball);
   }
 
   /**
@@ -18,7 +18,7 @@ export class ShrinkBall extends BasePowerUp {
    */
   play() {
     if (this.hitTest(this.pong.ball)) {
-      if (this.pong.ball.radius >= 2) {
+      if (this.pong.ball.radius >= 6) {
         this.pong.ball.radius -= 2;
       }
     }

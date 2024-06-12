@@ -1,12 +1,12 @@
 import { Paddle } from "./paddle.js";
 import { Ball } from "./ball.js";
 import { Render } from "./render.js";
-import { ChaosBall } from "../power-ups/chaos-ball.js";
-import { SpeedBall } from "../power-ups/speed-ball.js";
-import { LengthBall } from "../power-ups/length-ball.js";
-import { GrowBall } from "../power-ups/grow-ball.js";
-import { PaddleColorBall } from "../power-ups/paddle-color-ball.js";
-import { ShrinkBall } from "../power-ups/shrink-ball.js";
+import { ChaosBall } from "./power-ups/chaos-ball.js";
+import { SpeedBall } from "./power-ups/speed-ball.js";
+import { LengthBall } from "./power-ups/length-ball.js";
+import { GrowBall } from "./power-ups/grow-ball.js";
+import { PaddleColorBall } from "./power-ups/paddle-color-ball.js";
+import { ShrinkBall } from "./power-ups/shrink-ball.js";
 
 export class Pong {
   constructor(canvasId) {

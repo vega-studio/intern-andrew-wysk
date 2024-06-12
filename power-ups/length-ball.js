@@ -10,7 +10,7 @@ export class LengthBall extends BasePowerUp {
    * @return {boolean} True if the ball hits this powerup
    */
   hitTest(ball) {
-    super.hitTest(ball);
+    return super.hitTest(ball);
   }
 
   /**
@@ -20,11 +20,11 @@ export class LengthBall extends BasePowerUp {
     if (this.hitTest(this.pong.ball)) {
       if (this.pong.ball.color === "#00f") {
         if (this.pong.paddle1.height <= 200) {
-          this.pong.paddle1.height += 10;
+          this.pong.paddle1.height += 5;
         }
       } else {
         if (this.pong.paddle2.height <= 200) {
-          this.pong.paddle2.height += 10;
+          this.pong.paddle2.height += 5;
         }
       }
     }

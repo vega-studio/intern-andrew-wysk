@@ -10,7 +10,7 @@ export class SpeedBall extends BasePowerUp {
    * @return {boolean} True if the ball hits this powerup
    */
   hitTest(ball) {
-    super.hitTest(ball);
+    return super.hitTest(ball);
   }
 
   /**
@@ -19,9 +19,9 @@ export class SpeedBall extends BasePowerUp {
   play() {
     if (this.hitTest(this.pong.ball)) {
       if (this.pong.ball.color === "#00f") {
-        if (this.pong.paddle1.velocity <= 20) this.pong.paddle1.velocity += 2;
+        if (this.pong.paddle1.velocity <= 20) this.pong.paddle1.velocity++;
       } else {
-        if (this.pong.paddle1.velocity <= 20) this.pong.paddle2.velocity += 2;
+        if (this.pong.paddle1.velocity <= 20) this.pong.paddle2.velocity++;
       }
     }
   }

@@ -10,7 +10,7 @@ export class GrowBall extends BasePowerUp {
    * @return {boolean} True if the ball hits this powerup
    */
   hitTest(ball) {
-    super.hitTest(ball);
+    return super.hitTest(ball);
   }
 
   /**

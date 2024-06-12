@@ -1,4 +1,5 @@
 import { BasePowerUp } from "./base-power-up.js";
+import { Ball } from "../ball.js";
 
 export class ChaosBall extends BasePowerUp {
   constructor(pong, x, y, radius, color) {
@@ -13,7 +14,7 @@ export class ChaosBall extends BasePowerUp {
    * @return {boolean} True if the ball hits this powerup
    */
   hitTest(ball) {
-    super.hitTest(ball);
+    return super.hitTest(ball);
   }
 
   /**
@@ -23,26 +24,28 @@ export class ChaosBall extends BasePowerUp {
     // Makes and pushes new balls into balls
     if (this.hitTest(this.pong.ball)) {
       if (this.pong.ball.color === "#f00") {
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 100; i++) {
           this.balls.push(
             new Ball(
               (this.pong.screenSize.width / 2) * Math.random(),
               this.pong.screenSize.height * Math.random(),
-              this.pong.radius,
+              8,
               this.pong.ball.velocity,
               "#f00"
             )
           );
         }
       } else {
-        this.pong.loseReactionTime += 150;
-        for (let i = 0; i < 200; i++) {
+        if (this.pong.loseReactionTime <= 200) {
+          this.pong.loseReactionTime += 50;
+        }
+        for (let i = 0; i < 100; i++) {
           this.balls.push(
             new Ball(
               (this.pong.screenSize.width / 2) * Math.random() +
                 this.pong.screenSize.width / 2,
-              this.screenSize.height * Math.random(),
-              this.pong.ball.radius,
+              this.pong.screenSize.height * Math.random(),
+              8,
               this.pong.ball.velocity,
               "#00f"
             )
