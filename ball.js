@@ -21,8 +21,13 @@ export class Ball {
     this.y = h;
     this.radius = 8;
     this.isLeft = !this.isLeft;
-    if (this.isLeft) this.theta = Math.PI;
-    else this.theta = Math.PI * 2;
+    if (this.isLeft) {
+      this.theta = Math.PI;
+      this.color = "#f00";
+    } else {
+      this.theta = Math.PI * 2;
+      this.color = "#00f";
+    }
   }
   show() {
     Render.drawCircle(this.color, this.radius, this.x, this.y);

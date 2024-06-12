@@ -118,7 +118,7 @@ export class Pong {
   }
 
   /**
-   * Score checks whether ball reached either end and adds to score accordingly. It also resets the ball after
+   * Score checks whether ball reached either end and adds to score accordingly. It also resets everything after
    */
   score() {
     if (this.ball.x - this.ball.radius < -5) {
@@ -138,16 +138,7 @@ export class Pong {
       this.paddle2.velocity = 10;
       this.powerUpBalls[0].balls = [];
       this.loseReactionTime = 0;
-      if (
-        this.paddle2.y + this.paddle2.height / 2 <
-        this.screenSize.height / 2 - 20
-      )
-        this.paddle2.y += this.paddle2.velocity;
-      if (
-        this.paddle2.y + this.paddle2.height / 2 >
-        this.screenSize.height / 2 + 20
-      )
-        this.paddle2.y -= this.paddle2.velocity;
+      this.paddle2.y -= this.paddle2.velocity;
       this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
       this.paddle1.reset();
       this.paddle2.reset();
