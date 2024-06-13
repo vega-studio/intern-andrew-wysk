@@ -18,9 +18,10 @@ export class ShrinkBall extends BasePowerUp {
    */
   play() {
     for (let i = 0; i < this.pong.numOfGameBalls; i++) {
-      if (this.hitTest(this.pong.gameBalls[i])) {
-        if (this.pong.gameBalls[i].radius >= 6) {
-          this.pong.gameBalls[i].radius -= 2;
+      const gameBall = this.pong.gameBalls[i];
+      if (this.hitTest(gameBall)) {
+        if (gameBall.radius >= 6) {
+          gameBall.radius -= 2;
         }
       }
     }

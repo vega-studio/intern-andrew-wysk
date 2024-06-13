@@ -18,8 +18,9 @@ export class SpeedBall extends BasePowerUp {
    */
   play() {
     for (let i = 0; i < this.pong.numOfGameBalls; i++) {
-      if (this.hitTest(this.pong.gameBalls[i])) {
-        if (this.pong.gameBalls[i].color === "#00f") {
+      const gameBall = this.pong.gameBalls[i];
+      if (this.hitTest(gameBall)) {
+        if (gameBall.color === "#00f") {
           if (this.pong.paddle1.velocity <= 20) this.pong.paddle1.velocity++;
         } else {
           if (this.pong.paddle1.velocity <= 20) this.pong.paddle2.velocity++;

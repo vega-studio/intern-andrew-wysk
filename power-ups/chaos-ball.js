@@ -23,8 +23,9 @@ export class ChaosBall extends BasePowerUp {
   play() {
     // Makes and pushes new balls into balls
     for (let i = 0; i < this.pong.numOfGameBalls; i++) {
-      if (this.hitTest(this.pong.gameBalls[i])) {
-        if (this.pong.gameBalls[i].color === "#f00") {
+      const gameBall = this.pong.gameBalls[i];
+      if (this.hitTest(gameBall)) {
+        if (gameBall.color === "#f00") {
           if (this.pong.loseReactionTime <= 200) {
             this.pong.loseReactionTime += 50;
           }
@@ -34,7 +35,7 @@ export class ChaosBall extends BasePowerUp {
                 (this.pong.screenSize.width / 2) * Math.random(),
                 this.pong.screenSize.height * Math.random(),
                 8,
-                this.pong.gameBalls[i].velocity,
+                gameBall.velocity,
                 "#f00"
               )
             );
@@ -50,7 +51,7 @@ export class ChaosBall extends BasePowerUp {
                   this.pong.screenSize.width / 2,
                 this.pong.screenSize.height * Math.random(),
                 8,
-                this.pong.gameBalls[i].velocity,
+                gameBall.velocity,
                 "#00f"
               )
             );

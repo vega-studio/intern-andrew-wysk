@@ -30,7 +30,7 @@ export class Pong {
     // Delay for AI when there is chaos
     this.loseReactionTime = 0;
 
-    this.numOfGameBalls = 2;
+    this.numOfGameBalls = 1000;
     this.gameBalls = [];
 
     // Power up balls
@@ -115,7 +115,7 @@ export class Pong {
           new Ball(
             this.screenSize.width / 2,
             this.screenSize.height / 2 +
-              Math.random() * (this.screenSize.height / 2 - 100),
+              Math.random() * (this.screenSize.height / 2 - 350),
             this.radius,
             this.velocity,
             "#f00"
@@ -126,7 +126,7 @@ export class Pong {
           new Ball(
             this.screenSize.width / 2,
             this.screenSize.height / 2 -
-              Math.random() * (this.screenSize.height / 2 - 100),
+              Math.random() * (this.screenSize.height / 2 - 350),
             this.radius,
             this.velocity,
             "#f00"
@@ -143,50 +143,47 @@ export class Pong {
    */
   score() {
     for (let i = 0; i < this.numOfGameBalls; i++) {
-      if (this.gameBalls[i].x - this.gameBalls[i].radius < -5) {
+      const gameBall = this.gameBalls[i];
+      if (gameBall.x - gameBall.radius < -5) {
         this.score2++;
-        this.gameBalls[i].velocity = 10;
+        gameBall.velocity = 10;
         this.paddle1.velocity = 10;
         this.paddle2.velocity = 10;
         this.powerUpBalls[0].balls = [];
         this.loseReactionTime = 0;
         if (i % 2 == 0) {
-          this.gameBalls[i].reset(
+          gameBall.reset(
             this.screenSize.width / 2,
             this.screenSize.height / 2 +
-              Math.random() * (this.screenSize.height / 2 - 100)
+              Math.random() * (this.screenSize.height / 2 - 350)
           );
         } else {
-          this.gameBalls[i].reset(
+          gameBall.reset(
             this.screenSize.width / 2,
             this.screenSize.height / 2 -
-              Math.random() * (this.screenSize.height / 2 - 100)
+              Math.random() * (this.screenSize.height / 2 - 350)
           );
         }
         this.paddle1.reset();
         this.paddle2.reset();
-      } else if (
-        this.gameBalls[i].x + this.gameBalls[i].radius >
-        this.screenSize.width + 5
-      ) {
+      } else if (gameBall.x + gameBall.radius > this.screenSize.width + 5) {
         this.score1++;
-        this.gameBalls[i].velocity = 10;
+        gameBall.velocity = 10;
         this.paddle1.velocity = 10;
         this.paddle2.velocity = 10;
         this.powerUpBalls[0].balls = [];
         this.loseReactionTime = 0;
-        this.paddle2.y -= this.paddle2.velocity;
         if (i % 2 == 0) {
-          this.gameBalls[i].reset(
+          gameBall.reset(
             this.screenSize.width / 2,
             this.screenSize.height / 2 +
-              Math.random() * (this.screenSize.height / 2 - 100)
+              Math.random() * (this.screenSize.height / 2 - 350)
           );
         } else {
-          this.gameBalls[i].reset(
+          gameBall.reset(
             this.screenSize.width / 2,
             this.screenSize.height / 2 -
-              Math.random() * (this.screenSize.height / 2 - 100)
+              Math.random() * (this.screenSize.height / 2 - 350)
           );
         }
         this.paddle1.reset();
@@ -196,7 +193,7 @@ export class Pong {
   }
 
   /**
-   * DisplayScore makes characters for score appear at top middle that change based on each current score
+   * Makes score, middle line, and instructions appear
    *
    *
    */
@@ -209,12 +206,57 @@ export class Pong {
       this.screenSize.width / 2 + 11.5,
       0
     );
-    Render.drawText("#fff", "1) MAKE PLAYER 1 AI: [1]", 12.5, "Arial", 25, 15);
-    Render.drawText("#fff", "2) MAKE PLAYER 2 AI: [2]", 12.5, "Arial", 25, 30);
-    Render.drawText("#fff", "3) TURN OFF ALL AI: [o]", 12.5, "Arial", 25, 45);
     Render.drawText(
       "#fff",
-      "4) RED BALL: HIT TO CREATE CHAOS ON YOUR OPPONENT'S SIDE",
+      "MAKE PLAYER 1 AI: [1]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 150,
+      15
+    );
+    Render.drawText(
+      "#fff",
+      "MAKE PLAYER 2 AI: [2]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 150,
+      30
+    );
+    Render.drawText(
+      "#fff",
+      "TURN OFF ALL AI: [o]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 150,
+      45
+    );
+    Render.drawText(
+      "#fff",
+      "RED BALL: HIT TO CREATE CHAOS ON YOUR OPPONENT'S SIDE",
+      12.5,
+      "Arial",
+      25,
+      15
+    );
+    Render.drawText(
+      "#fff",
+      "ORANGE BALL: HIT TO INCREASE YOUR PADDLE SPEED",
+      12.5,
+      "Arial",
+      25,
+      30
+    );
+    Render.drawText(
+      "#fff",
+      "YELLOW BALL: HIT TO INCREASE YOUR PADDLE'S LENGTH",
+      12.5,
+      "Arial",
+      25,
+      45
+    );
+    Render.drawText(
+      "#fff",
+      "GREEN BALL: HIT TO GROW THE BALL",
       12.5,
       "Arial",
       25,
@@ -222,7 +264,7 @@ export class Pong {
     );
     Render.drawText(
       "#fff",
-      "5) ORANGE BALL: HIT TO INCREASE YOUR PADDLE SPEED",
+      "BLUE BALL: HIT TO ENHANCE YOUR PADDLE'S COLOR",
       12.5,
       "Arial",
       25,
@@ -230,35 +272,11 @@ export class Pong {
     );
     Render.drawText(
       "#fff",
-      "6) YELLOW BALL: HIT TO INCREASE YOUR PADDLE'S LENGTH",
+      "PURPLE BALL: HIT TO SHRINK THE BALL",
       12.5,
       "Arial",
       25,
       90
-    );
-    Render.drawText(
-      "#fff",
-      "7) GREEN BALL: HIT TO GROW THE BALL",
-      12.5,
-      "Arial",
-      25,
-      105
-    );
-    Render.drawText(
-      "#fff",
-      "8) BLUE BALL: HIT TO ENHANCE YOUR PADDLE'S COLOR",
-      12.5,
-      "Arial",
-      25,
-      120
-    );
-    Render.drawText(
-      "#fff",
-      "9) PURPLE BALL: HIT TO SHRINK THE BALL",
-      12.5,
-      "Arial",
-      25,
-      135
     );
     if (score === this.score1)
       if (score >= 10)
@@ -355,14 +373,14 @@ export class Pong {
     for (let i = 0; i < this.powerUpBalls[0].balls.length; i++) {
       this.powerUpBalls[0].balls[i].theta = Math.random() * 2 * Math.PI;
     }
-
     // Move player 1
     if (this.keys["1"]) this.activeAI1 = true;
     if (this.activeAI1) {
       if (this.numOfGameBalls === 1) {
         for (let i = 0; i < this.numOfGameBalls; i++) {
-          this.paddle1.positionAI(this.gameBalls[i]);
-          if (this.gameBalls[i].color === "#00f") {
+          const gameBall = this.gameBalls[i];
+          this.paddle1.positionAI(gameBall);
+          if (gameBall.color === "#00f") {
             this.paddle1.goTo(this.screenSize.height / 2);
           }
         }
@@ -385,8 +403,9 @@ export class Pong {
     if (this.activeAI2) {
       if (this.numOfGameBalls === 1) {
         for (let i = 0; i < this.numOfGameBalls; i++) {
-          this.paddle2.positionAI(this.gameBalls[i]);
-          if (this.gameBalls[i].color === "#f00") {
+          const gameBall = this.gameBalls[i];
+          this.paddle2.positionAI(gameBall);
+          if (gameBall.color === "#f00") {
             this.paddle2.goTo(this.screenSize.height / 2);
           }
         }
@@ -400,7 +419,7 @@ export class Pong {
         this.paddle2.y + this.paddle2.height < this.screenSize.height &&
         this.keys["ArrowDown"]
       )
-        this.paddle2.yChange = this.velocity;
+        this.paddle2.yChange = this.paddle2.velocity;
       else this.paddle2.yChange = 0;
     }
     // Turns off both AIs
@@ -416,51 +435,50 @@ export class Pong {
 
     // Ceiling bounce
     for (let i = 0; i < this.numOfGameBalls; i++) {
+      const gameBall = this.gameBalls[i];
       if (
-        this.gameBalls[i].y - this.gameBalls[i].radius <= 0 ||
-        this.gameBalls[i].y + this.gameBalls[i].radius >= this.screenSize.height
+        gameBall.y - gameBall.radius <= 0 ||
+        gameBall.y + gameBall.radius >= this.screenSize.height
       ) {
-        this.gameBalls[i].theta = this.gameBalls[i].theta * -1;
+        gameBall.theta = gameBall.theta * -1;
       }
     }
 
     // Paddle bounce
     for (let i = 0; i < this.numOfGameBalls; i++) {
+      const gameBall = this.gameBalls[i];
       if (
-        this.gameBalls[i].x - this.gameBalls[i].radius <=
-          this.paddle1.x + this.paddle1.width &&
-        this.gameBalls[i].y >= this.paddle1.y &&
-        this.gameBalls[i].y <= this.paddle1.y + this.paddle1.height
+        gameBall.x - gameBall.radius <= this.paddle1.x + this.paddle1.width &&
+        gameBall.y >= this.paddle1.y &&
+        gameBall.y <= this.paddle1.y + this.paddle1.height
       ) {
-        if (this.gameBalls[i].velocity <= 16.5)
-          this.gameBalls[i].velocity += 0.5;
+        if (gameBall.velocity <= 16.5) gameBall.velocity += 0.5;
         let relativeIntersectY =
-          this.paddle1.y + this.paddle1.height / 2 - this.gameBalls[i].y;
+          this.paddle1.y + this.paddle1.height / 2 - gameBall.y;
         let normalizedRelativeIntersectionY =
           relativeIntersectY / (this.paddle1.height / 2);
         let bounceAngle =
           normalizedRelativeIntersectionY * ((5 * Math.PI) / 12);
-        this.gameBalls[i].theta = bounceAngle;
-        this.gameBalls[i].color = "#00f";
+        gameBall.theta = bounceAngle;
+        gameBall.color = "#00f";
       } else if (
-        this.gameBalls[i].x + this.gameBalls[i].radius >= this.paddle2.x &&
-        this.gameBalls[i].y >= this.paddle2.y &&
-        this.gameBalls[i].y <= this.paddle2.y + this.paddle2.height
+        gameBall.x + gameBall.radius >= this.paddle2.x &&
+        gameBall.y >= this.paddle2.y &&
+        gameBall.y <= this.paddle2.y + this.paddle2.height
       ) {
-        if (this.gameBalls[i].velocity <= 16.5)
-          this.gameBalls[i].velocity += 0.5;
+        if (gameBall.velocity <= 16.5) gameBall.velocity += 0.5;
         let relativeIntersectY =
-          this.paddle2.y + this.paddle2.height / 2 - this.gameBalls[i].y;
+          this.paddle2.y + this.paddle2.height / 2 - gameBall.y;
         let normalizedRelativeIntersectionY =
           relativeIntersectY / (this.paddle2.height / 2);
         let bounceAngle =
           normalizedRelativeIntersectionY * ((5 * Math.PI) / 12);
-        this.gameBalls[i].theta = Math.PI - bounceAngle;
-        this.gameBalls[i].color = "#f00";
+        gameBall.theta = Math.PI - bounceAngle;
+        gameBall.color = "#f00";
       }
 
       // Position the ball according to it's current state
-      this.gameBalls[i].position();
+      gameBall.position();
     }
     // Calculate score
     this.score();

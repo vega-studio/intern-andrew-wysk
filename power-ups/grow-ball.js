@@ -18,9 +18,10 @@ export class GrowBall extends BasePowerUp {
    */
   play() {
     for (let i = 0; i < this.pong.numOfGameBalls; i++) {
-      if (this.hitTest(this.pong.gameBalls[i])) {
-        if (this.pong.gameBalls[i].radius <= 50) {
-          this.pong.gameBalls[i].radius += 2;
+      const gameBall = this.pong.gameBalls[i];
+      if (this.hitTest(gameBall)) {
+        if (gameBall.radius <= 100) {
+          gameBall.radius += 2;
         }
       }
     }

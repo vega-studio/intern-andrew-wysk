@@ -18,6 +18,7 @@ export class LengthBall extends BasePowerUp {
    */
   play() {
     for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+      const gameBall = this.pong.gameBalls[i];
       if (this.hitTest(this.pong.gameBalls[i])) {
         if (this.pong.gameBalls[i].color === "#00f") {
           if (this.pong.paddle1.height <= 200) {
