@@ -17,9 +17,11 @@ export class GrowBall extends BasePowerUp {
    * Logic loop for executing code on the game loop.
    */
   play() {
-    if (this.hitTest(this.pong.ball)) {
-      if (this.pong.ball.radius <= 50) {
-        this.pong.ball.radius += 2;
+    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+      if (this.hitTest(this.pong.gameBalls[i])) {
+        if (this.pong.gameBalls[i].radius <= 50) {
+          this.pong.gameBalls[i].radius += 2;
+        }
       }
     }
   }

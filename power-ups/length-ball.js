@@ -17,14 +17,16 @@ export class LengthBall extends BasePowerUp {
    * Logic loop for executing code on the game loop.
    */
   play() {
-    if (this.hitTest(this.pong.ball)) {
-      if (this.pong.ball.color === "#00f") {
-        if (this.pong.paddle1.height <= 200) {
-          this.pong.paddle1.height += 5;
-        }
-      } else {
-        if (this.pong.paddle2.height <= 200) {
-          this.pong.paddle2.height += 5;
+    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+      if (this.hitTest(this.pong.gameBalls[i])) {
+        if (this.pong.gameBalls[i].color === "#00f") {
+          if (this.pong.paddle1.height <= 200) {
+            this.pong.paddle1.height += 5;
+          }
+        } else {
+          if (this.pong.paddle2.height <= 200) {
+            this.pong.paddle2.height += 5;
+          }
         }
       }
     }

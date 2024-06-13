@@ -22,34 +22,39 @@ export class ChaosBall extends BasePowerUp {
    */
   play() {
     // Makes and pushes new balls into balls
-    if (this.hitTest(this.pong.ball)) {
-      if (this.pong.ball.color === "#f00") {
-        for (let i = 0; i < 100; i++) {
-          this.balls.push(
-            new Ball(
-              (this.pong.screenSize.width / 2) * Math.random(),
-              this.pong.screenSize.height * Math.random(),
-              8,
-              this.pong.ball.velocity,
-              "#f00"
-            )
-          );
-        }
-      } else {
-        if (this.pong.loseReactionTime <= 200) {
-          this.pong.loseReactionTime += 50;
-        }
-        for (let i = 0; i < 100; i++) {
-          this.balls.push(
-            new Ball(
-              (this.pong.screenSize.width / 2) * Math.random() +
-                this.pong.screenSize.width / 2,
-              this.pong.screenSize.height * Math.random(),
-              8,
-              this.pong.ball.velocity,
-              "#00f"
-            )
-          );
+    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+      if (this.hitTest(this.pong.gameBalls[i])) {
+        if (this.pong.gameBalls[i].color === "#f00") {
+          if (this.pong.loseReactionTime <= 200) {
+            this.pong.loseReactionTime += 50;
+          }
+          for (let j = 0; j < 100; j++) {
+            this.balls.push(
+              new Ball(
+                (this.pong.screenSize.width / 2) * Math.random(),
+                this.pong.screenSize.height * Math.random(),
+                8,
+                this.pong.gameBalls[i].velocity,
+                "#f00"
+              )
+            );
+          }
+        } else {
+          if (this.pong.loseReactionTime <= 200) {
+            this.pong.loseReactionTime += 50;
+          }
+          for (let j = 0; j < 100; j++) {
+            this.balls.push(
+              new Ball(
+                (this.pong.screenSize.width / 2) * Math.random() +
+                  this.pong.screenSize.width / 2,
+                this.pong.screenSize.height * Math.random(),
+                8,
+                this.pong.gameBalls[i].velocity,
+                "#00f"
+              )
+            );
+          }
         }
       }
     }

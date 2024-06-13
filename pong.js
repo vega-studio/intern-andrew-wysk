@@ -30,6 +30,9 @@ export class Pong {
     // Delay for AI when there is chaos
     this.loseReactionTime = 0;
 
+    this.numOfGameBalls = 2;
+    this.gameBalls = [];
+
     // Power up balls
     // Chaos: Red
     // Speed: Orange
@@ -106,13 +109,31 @@ export class Pong {
       this.loseReactionTime
     );
 
-    this.ball = new Ball(
-      this.screenSize.width / 2,
-      this.screenSize.height / 2,
-      this.radius,
-      this.velocity,
-      "#f00"
-    );
+    for (let i = 0; i < this.numOfGameBalls; i++) {
+      if (i % 2 === 0) {
+        this.gameBalls.push(
+          new Ball(
+            this.screenSize.width / 2,
+            this.screenSize.height / 2 +
+              Math.random() * (this.screenSize.height / 2 - 100),
+            this.radius,
+            this.velocity,
+            "#f00"
+          )
+        );
+      } else {
+        this.gameBalls.push(
+          new Ball(
+            this.screenSize.width / 2,
+            this.screenSize.height / 2 -
+              Math.random() * (this.screenSize.height / 2 - 100),
+            this.radius,
+            this.velocity,
+            "#f00"
+          )
+        );
+      }
+    }
 
     this.initGame();
   }
@@ -121,27 +142,56 @@ export class Pong {
    * Score checks whether ball reached either end and adds to score accordingly. It also resets everything after
    */
   score() {
-    if (this.ball.x - this.ball.radius < -5) {
-      this.score2++;
-      this.ball.velocity = 10;
-      this.paddle1.velocity = 10;
-      this.paddle2.velocity = 10;
-      this.powerUpBalls[0].balls = [];
-      this.loseReactionTime = 0;
-      this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
-      this.paddle1.reset();
-      this.paddle2.reset();
-    } else if (this.ball.x + this.ball.radius > this.screenSize.width + 5) {
-      this.score1++;
-      this.ball.velocity = 10;
-      this.paddle1.velocity = 10;
-      this.paddle2.velocity = 10;
-      this.powerUpBalls[0].balls = [];
-      this.loseReactionTime = 0;
-      this.paddle2.y -= this.paddle2.velocity;
-      this.ball.reset(this.screenSize.width / 2, this.screenSize.height / 2);
-      this.paddle1.reset();
-      this.paddle2.reset();
+    for (let i = 0; i < this.numOfGameBalls; i++) {
+      if (this.gameBalls[i].x - this.gameBalls[i].radius < -5) {
+        this.score2++;
+        this.gameBalls[i].velocity = 10;
+        this.paddle1.velocity = 10;
+        this.paddle2.velocity = 10;
+        this.powerUpBalls[0].balls = [];
+        this.loseReactionTime = 0;
+        if (i % 2 == 0) {
+          this.gameBalls[i].reset(
+            this.screenSize.width / 2,
+            this.screenSize.height / 2 +
+              Math.random() * (this.screenSize.height / 2 - 100)
+          );
+        } else {
+          this.gameBalls[i].reset(
+            this.screenSize.width / 2,
+            this.screenSize.height / 2 -
+              Math.random() * (this.screenSize.height / 2 - 100)
+          );
+        }
+        this.paddle1.reset();
+        this.paddle2.reset();
+      } else if (
+        this.gameBalls[i].x + this.gameBalls[i].radius >
+        this.screenSize.width + 5
+      ) {
+        this.score1++;
+        this.gameBalls[i].velocity = 10;
+        this.paddle1.velocity = 10;
+        this.paddle2.velocity = 10;
+        this.powerUpBalls[0].balls = [];
+        this.loseReactionTime = 0;
+        this.paddle2.y -= this.paddle2.velocity;
+        if (i % 2 == 0) {
+          this.gameBalls[i].reset(
+            this.screenSize.width / 2,
+            this.screenSize.height / 2 +
+              Math.random() * (this.screenSize.height / 2 - 100)
+          );
+        } else {
+          this.gameBalls[i].reset(
+            this.screenSize.width / 2,
+            this.screenSize.height / 2 -
+              Math.random() * (this.screenSize.height / 2 - 100)
+          );
+        }
+        this.paddle1.reset();
+        this.paddle2.reset();
+      }
     }
   }
 
@@ -308,11 +358,16 @@ export class Pong {
 
     // Move player 1
     if (this.keys["1"]) this.activeAI1 = true;
-
     if (this.activeAI1) {
-      this.paddle1.positionAI(this.ball);
-      if (this.ball.color === "#00f") {
-        this.paddle1.relocateAI(this.ball);
+      if (this.numOfGameBalls === 1) {
+        for (let i = 0; i < this.numOfGameBalls; i++) {
+          this.paddle1.positionAI(this.gameBalls[i]);
+          if (this.gameBalls[i].color === "#00f") {
+            this.paddle1.goTo(this.screenSize.height / 2);
+          }
+        }
+      } else {
+        this.paddle1.goToDenseLeft();
       }
     } else {
       if (this.paddle1.y > 0 && this.keys["w"])
@@ -328,9 +383,15 @@ export class Pong {
     // Move player 2
     if (this.keys["2"]) this.activeAI2 = true;
     if (this.activeAI2) {
-      this.paddle2.positionAI(this.ball);
-      if (this.ball.color === "#f00") {
-        this.paddle2.relocateAI(this.ball);
+      if (this.numOfGameBalls === 1) {
+        for (let i = 0; i < this.numOfGameBalls; i++) {
+          this.paddle2.positionAI(this.gameBalls[i]);
+          if (this.gameBalls[i].color === "#f00") {
+            this.paddle2.goTo(this.screenSize.height / 2);
+          }
+        }
+      } else {
+        this.paddle2.goToDenseRight();
       }
     } else {
       if (this.paddle2.y > 0 && this.keys["ArrowUp"])
@@ -354,51 +415,53 @@ export class Pong {
     this.paddle2.position();
 
     // Ceiling bounce
-    if (
-      this.ball.y - this.ball.radius <= 0 ||
-      this.ball.y + this.ball.radius >= this.screenSize.height
-    ) {
-      this.ball.theta = this.ball.theta * -1;
+    for (let i = 0; i < this.numOfGameBalls; i++) {
+      if (
+        this.gameBalls[i].y - this.gameBalls[i].radius <= 0 ||
+        this.gameBalls[i].y + this.gameBalls[i].radius >= this.screenSize.height
+      ) {
+        this.gameBalls[i].theta = this.gameBalls[i].theta * -1;
+      }
     }
 
-    // Collision check with random bounce
-    if (
-      this.ball.x - this.ball.radius <= this.paddle1.x + this.paddle1.width &&
-      this.ball.y >= this.paddle1.y &&
-      this.ball.y <= this.paddle1.y + this.paddle1.height
-    ) {
-      if (this.ball.velocity <= 16.5) this.ball.velocity += 0.5;
-      let relativeIntersectY =
-        this.paddle1.y + this.paddle1.height / 2 - this.ball.y;
-      let normalizedRelativeIntersectionY =
-        relativeIntersectY / (this.paddle1.height / 2);
-      let bounceAngle = normalizedRelativeIntersectionY * ((5 * Math.PI) / 12);
-      this.ball.theta = bounceAngle;
-      //   this.ball.theta =
-      //     (Math.random() * (2 * Math.PI + Math.PI / 3 - (5 * Math.PI) / 3) +
-      //       (5 * Math.PI) / 3) %
-      //     (2 * Math.PI);
-      this.ball.color = "#00f";
-    } else if (
-      this.ball.x + this.ball.radius >= this.paddle2.x &&
-      this.ball.y >= this.paddle2.y &&
-      this.ball.y <= this.paddle2.y + this.paddle2.height
-    ) {
-      if (this.ball.velocity <= 16.5) this.ball.velocity += 0.5;
-      let relativeIntersectY =
-        this.paddle2.y + this.paddle2.height / 2 - this.ball.y;
-      let normalizedRelativeIntersectionY =
-        relativeIntersectY / (this.paddle2.height / 2);
-      let bounceAngle = normalizedRelativeIntersectionY * ((5 * Math.PI) / 12);
-      this.ball.theta = Math.PI - bounceAngle;
-      //   this.ball.theta =
-      //     Math.random() * ((4 * Math.PI) / 3 - (2 * Math.PI) / 3) +
-      //     (2 * Math.PI) / 3;
-      this.ball.color = "#f00";
-    }
+    // Paddle bounce
+    for (let i = 0; i < this.numOfGameBalls; i++) {
+      if (
+        this.gameBalls[i].x - this.gameBalls[i].radius <=
+          this.paddle1.x + this.paddle1.width &&
+        this.gameBalls[i].y >= this.paddle1.y &&
+        this.gameBalls[i].y <= this.paddle1.y + this.paddle1.height
+      ) {
+        if (this.gameBalls[i].velocity <= 16.5)
+          this.gameBalls[i].velocity += 0.5;
+        let relativeIntersectY =
+          this.paddle1.y + this.paddle1.height / 2 - this.gameBalls[i].y;
+        let normalizedRelativeIntersectionY =
+          relativeIntersectY / (this.paddle1.height / 2);
+        let bounceAngle =
+          normalizedRelativeIntersectionY * ((5 * Math.PI) / 12);
+        this.gameBalls[i].theta = bounceAngle;
+        this.gameBalls[i].color = "#00f";
+      } else if (
+        this.gameBalls[i].x + this.gameBalls[i].radius >= this.paddle2.x &&
+        this.gameBalls[i].y >= this.paddle2.y &&
+        this.gameBalls[i].y <= this.paddle2.y + this.paddle2.height
+      ) {
+        if (this.gameBalls[i].velocity <= 16.5)
+          this.gameBalls[i].velocity += 0.5;
+        let relativeIntersectY =
+          this.paddle2.y + this.paddle2.height / 2 - this.gameBalls[i].y;
+        let normalizedRelativeIntersectionY =
+          relativeIntersectY / (this.paddle2.height / 2);
+        let bounceAngle =
+          normalizedRelativeIntersectionY * ((5 * Math.PI) / 12);
+        this.gameBalls[i].theta = Math.PI - bounceAngle;
+        this.gameBalls[i].color = "#f00";
+      }
 
-    // Position the ball according to it's current state
-    this.ball.position();
+      // Position the ball according to it's current state
+      this.gameBalls[i].position();
+    }
     // Calculate score
     this.score();
   }
@@ -418,7 +481,9 @@ export class Pong {
     this.powerUpBalls.forEach((e) => {
       e.show(this.dimension);
     });
-    this.ball.show(this.dimension);
+    this.gameBalls.forEach((e) => {
+      e.show(this.dimension);
+    });
     this.paddle1.show(this.dimension);
     this.paddle2.show(this.dimension);
   }

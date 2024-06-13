@@ -10,16 +10,195 @@ export class Paddle {
     this.velocity = velocity;
     this.color = color;
     this.pong = pong;
+    // Marking reference lines and making counts for the number of balls in each row
+    this.half = this.pong.screenSize.width / 2;
+    this.row0 = this.pong.screenSize.height;
+    this.count1L = 0;
+    this.count1R = 0;
+    this.row1 = this.pong.screenSize / 5;
+    this.count2L = 0;
+    this.count2R = 0;
+    this.row2 = this.row1 * 2;
+    this.count3L = 0;
+    this.count3R = 0;
+    this.row3 = this.row1 * 3;
+    this.count4L = 0;
+    this.count4R = 0;
+    this.row4 = this.row3 * 4;
+    this.count5L = 0;
+    this.count5R = 0;
+    this.row5 = 0;
   }
   position() {
     this.y += this.yChange;
   }
+  resetCount() {
+    this.count1 = 0;
+    this.count2 = 0;
+    this.count3 = 0;
+    this.count4 = 0;
+    this.count5 = 0;
+  }
+  // Relocates to given y coordinate
+  goTo(yCoord) {
+    if (this.y + this.height / 2 < yCoord - 20) {
+      this.y += this.velocity;
+    }
+    if (this.y + this.height / 2 > yCoord + 20) {
+      this.y -= this.velocity;
+    } else {
+      this.yChange = 0;
+    }
+  }
+  // Relocates to the most ball dense row chunk on the left half
+  goToDenseLeft() {
+    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+      if (this.pong.gameBalls[i].x < this.half) {
+        if (
+          this.pong.gameBalls[i].y > this.row0 &&
+          this.pong.gameBalls[i].y < this.row1
+        ) {
+          this.count1L++;
+        } else if (
+          this.pong.gameBalls[i].y > this.row1 &&
+          this.pong.gameBalls[i].y < this.row2
+        ) {
+          this.count2L++;
+        } else if (
+          this.pong.gameBalls[i].y > this.row2 &&
+          this.pong.gameBalls[i].y < this.row3
+        ) {
+          this.count3L++;
+        } else if (
+          this.pong.gameBalls[i].y > this.row3 &&
+          this.pong.gameBalls[i].y < this.row4
+        ) {
+          this.count4L++;
+        } else if (
+          this.pong.gameBalls[i].y > this.row4 &&
+          this.pong.gameBalls[i].y < this.row5
+        ) {
+          this.count5L++;
+        }
+      } else {
+        this.goTo(this.pong.screenSize / 2);
+      }
+      if (
+        this.count1L >= this.count2L &&
+        this.count1L >= this.count3L &&
+        this.count1L >= this.count4L &&
+        this.count1L >= this.count5L
+      ) {
+        this.goTo((this.row0 + this.row1) / 2);
+      } else if (
+        this.count2L >= this.count1L &&
+        this.count2L >= this.count3L &&
+        this.count2L >= this.count4L &&
+        this.count2L >= this.count5L
+      ) {
+        this.goTo((this.row1 + this.row2) / 2);
+      } else if (
+        this.count3L >= this.count1L &&
+        this.count3L >= this.count2L &&
+        this.count3L >= this.count4L &&
+        this.count3L >= this.count5L
+      ) {
+        this.goTo((this.row2 + this.row3) / 2);
+      } else if (
+        this.count4L >= this.count1L &&
+        this.count4L >= this.count2L &&
+        this.count4L >= this.count3L &&
+        this.count4L >= this.count5L
+      ) {
+        this.goTo((this.row3 + this.row4) / 2);
+      } else if (
+        this.count5L >= this.count1L &&
+        this.count5L >= this.count2L &&
+        this.count5L >= this.count3L &&
+        this.count5L >= this.count4L
+      ) {
+        this.goTo((this.row4 + this.row5) / 2);
+      }
+      this.resetCount();
+    }
+  }
+  // Relocates to the most ball dense row chunk on the right half
+  goToDenseRight() {
+    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+      if (this.pong.gameBalls[i].x > this.half) {
+        if (
+          this.pong.gameBalls[i].y > this.row0 &&
+          this.pong.gameBalls[i].y < this.row1
+        ) {
+          this.count1R++;
+        } else if (
+          this.pong.gameBalls[i].y > this.row1 &&
+          this.pong.gameBalls[i].y < this.row2
+        ) {
+          this.count2R++;
+        } else if (
+          this.pong.gameBalls[i].y > this.row2 &&
+          this.pong.gameBalls[i].y < this.row3
+        ) {
+          this.count3R++;
+        } else if (
+          this.pong.gameBalls[i].y > this.row3 &&
+          this.pong.gameBalls[i].y < this.row4
+        ) {
+          this.count4R++;
+        } else if (
+          this.pong.gameBalls[i].y > this.row4 &&
+          this.pong.gameBalls[i].y < this.row5
+        ) {
+          this.count5R++;
+        }
+      } else {
+        this.goTo(this.pong.screenSize / 2);
+      }
+      if (
+        this.count1R >= this.count2R &&
+        this.count1R >= this.count3R &&
+        this.count1R >= this.count4R &&
+        this.count1R >= this.count5R
+      ) {
+        this.goTo((this.row0 + this.row1) / 2);
+      } else if (
+        this.count2R >= this.count1R &&
+        this.count2R >= this.count3R &&
+        this.count2R >= this.count4R &&
+        this.count2R >= this.count5R
+      ) {
+        this.goTo((this.row1 + this.row2) / 2);
+      } else if (
+        this.count3R >= this.count1R &&
+        this.count3R >= this.count2R &&
+        this.count3R >= this.count4R &&
+        this.count3R >= this.count5R
+      ) {
+        this.goTo((this.row2 + this.row3) / 2);
+      } else if (
+        this.count4R >= this.count1R &&
+        this.count4R >= this.count2R &&
+        this.count4R >= this.count3R &&
+        this.count4R >= this.count5R
+      ) {
+        this.goTo((this.row3 + this.row4) / 2);
+      } else if (
+        this.count5R >= this.count1R &&
+        this.count5R >= this.count2R &&
+        this.count5R >= this.count3R &&
+        this.count5R >= this.count4R
+      ) {
+        this.goTo((this.row4 + this.row5) / 2);
+      }
+      this.resetCount();
+    }
+  }
   positionAI(ball) {
     if (
-      (ball.x > this.pong.screenSize.width / 2 + this.pong.loseReactionTime &&
+      (ball.x > this.half + this.pong.loseReactionTime &&
         ball.color === "#00f") ||
-      (ball.x < this.pong.screenSize.width / 2 - this.pong.loseReactionTime &&
-        ball.color === "#f00")
+      (ball.x < this.half - this.pong.loseReactionTime && ball.color === "#f00")
     ) {
       if (
         this.y > 0 &&
@@ -40,17 +219,6 @@ export class Paddle {
       )
         this.yChange = this.velocity;
       else this.yChange = 0;
-    }
-  }
-  // Relocates to center
-  relocateAI(ball) {
-    if (this.y + this.height / 2 < this.pong.screenSize.height / 2 - 20) {
-      this.y += this.velocity;
-    }
-    if (this.y + this.height / 2 > this.pong.screenSize.height / 2 + 20) {
-      this.y -= this.velocity;
-    } else {
-      this.yChange = 0;
     }
   }
   reset() {
