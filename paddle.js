@@ -52,75 +52,31 @@ export class Paddle {
   }
   // Relocates to the most ball dense row chunk on the left half
   goToDenseLeft() {
+    const rowHeight = 50;
+    const rows = [];
+
+    // Find out how many balls per row
     for (let i = 0; i < this.pong.numOfGameBalls; i++) {
-      if (this.pong.gameBalls[i].x < this.half) {
-        if (
-          this.pong.gameBalls[i].y > this.row0 &&
-          this.pong.gameBalls[i].y < this.row1
-        ) {
-          this.count1L++;
-        } else if (
-          this.pong.gameBalls[i].y > this.row1 &&
-          this.pong.gameBalls[i].y < this.row2
-        ) {
-          this.count2L++;
-        } else if (
-          this.pong.gameBalls[i].y > this.row2 &&
-          this.pong.gameBalls[i].y < this.row3
-        ) {
-          this.count3L++;
-        } else if (
-          this.pong.gameBalls[i].y > this.row3 &&
-          this.pong.gameBalls[i].y < this.row4
-        ) {
-          this.count4L++;
-        } else if (
-          this.pong.gameBalls[i].y > this.row4 &&
-          this.pong.gameBalls[i].y < this.row5
-        ) {
-          this.count5L++;
-        }
-      } else {
-        this.goTo(this.pong.screenSize / 2);
+      const gameBall = this.pong.gameBalls[i];
+
+      if (gameBall.x < this.half) {
+        const rowIndex = Math.floor(gameBall.y / rowHeight);
+        rows[rowIndex] = (rows[rowIndex] || 0) + 1;
       }
-      if (
-        this.count1L >= this.count2L &&
-        this.count1L >= this.count3L &&
-        this.count1L >= this.count4L &&
-        this.count1L >= this.count5L
-      ) {
-        this.goTo((this.row0 + this.row1) / 2);
-      } else if (
-        this.count2L >= this.count1L &&
-        this.count2L >= this.count3L &&
-        this.count2L >= this.count4L &&
-        this.count2L >= this.count5L
-      ) {
-        this.goTo((this.row1 + this.row2) / 2);
-      } else if (
-        this.count3L >= this.count1L &&
-        this.count3L >= this.count2L &&
-        this.count3L >= this.count4L &&
-        this.count3L >= this.count5L
-      ) {
-        this.goTo((this.row2 + this.row3) / 2);
-      } else if (
-        this.count4L >= this.count1L &&
-        this.count4L >= this.count2L &&
-        this.count4L >= this.count3L &&
-        this.count4L >= this.count5L
-      ) {
-        this.goTo((this.row3 + this.row4) / 2);
-      } else if (
-        this.count5L >= this.count1L &&
-        this.count5L >= this.count2L &&
-        this.count5L >= this.count3L &&
-        this.count5L >= this.count4L
-      ) {
-        this.goTo((this.row4 + this.row5) / 2);
-      }
-      this.resetCount();
     }
+
+    // Find the row with the most balls
+    let maxCount = 0;
+    let rowWithMostBalls = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i] > maxCount) {
+        maxCount = rows[i];
+        rowWithMostBalls = i;
+      }
+    }
+
+    this.goTo(rowWithMostBalls * rowHeight + rowHeight / 2);
   }
   // Relocates to the most ball dense row chunk on the right half
   goToDenseRight() {
