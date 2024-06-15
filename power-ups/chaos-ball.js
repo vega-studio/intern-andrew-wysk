@@ -22,7 +22,7 @@ export class ChaosBall extends BasePowerUp {
    */
   play() {
     // Makes and pushes new balls into balls
-    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+    for (let i = 0; i < this.pong.gameBalls.length; i++) {
       const gameBall = this.pong.gameBalls[i];
       if (this.hitTest(gameBall)) {
         if (gameBall.color === "#f00") {
@@ -36,7 +36,8 @@ export class ChaosBall extends BasePowerUp {
                 this.pong.screenSize.height * Math.random(),
                 8,
                 gameBall.velocity,
-                "#f00"
+                "#f00",
+                this.pong.theta
               )
             );
           }
@@ -52,7 +53,8 @@ export class ChaosBall extends BasePowerUp {
                 this.pong.screenSize.height * Math.random(),
                 8,
                 gameBall.velocity,
-                "#00f"
+                "#00f",
+                this.pong.theta
               )
             );
           }
@@ -72,6 +74,16 @@ export class ChaosBall extends BasePowerUp {
       } else if (this.balls[i].color === "#f00") this.balls[i].x -= 50;
       else if (this.balls[i].color === "#00f") this.balls[i].x += 50;
     }
+
+    // Gives chaos balls random direction
+    for (let i = 0; i < this.balls.length; i++) {
+      this.balls[i].theta = Math.random() * 2 * Math.PI;
+    }
+  }
+
+  reset(i) {
+    this.balls = [];
+    this.pong.loseReactionTime = 0;
   }
 
   /**

@@ -17,7 +17,7 @@ export class LengthBall extends BasePowerUp {
    * Logic loop for executing code on the game loop.
    */
   play() {
-    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+    for (let i = 0; i < this.pong.gameBalls.length; i++) {
       const gameBall = this.pong.gameBalls[i];
       if (this.hitTest(this.pong.gameBalls[i])) {
         if (this.pong.gameBalls[i].color === "#00f") {
@@ -31,6 +31,11 @@ export class LengthBall extends BasePowerUp {
         }
       }
     }
+  }
+
+  reset(i) {
+    this.pong.paddle1.height = 100;
+    this.pong.paddle2.height = 100;
   }
 
   /**

@@ -1,13 +1,13 @@
 import { Render } from "./render.js";
 
 export class Ball {
-  constructor(x, y, radius, velocity, color) {
+  constructor(x, y, radius, velocity, color, theta) {
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.velocity = velocity;
     this.isLeft = true;
-    this.theta = Math.PI;
+    this.theta = theta;
     this.color = color;
   }
   position() {
@@ -19,7 +19,6 @@ export class Ball {
   reset(w, h) {
     this.x = w;
     this.y = h;
-    this.radius = 8;
     this.isLeft = !this.isLeft;
     if (this.isLeft) {
       this.theta = Math.PI;

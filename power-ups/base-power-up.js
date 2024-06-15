@@ -26,6 +26,9 @@ export class BasePowerUp {
   play() {
     throw new Error("ABSTRACT");
   }
+  reset(i) {
+    throw new Error("ABSTRACT");
+  }
 
   /**
    * Code executed for rendering

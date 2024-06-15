@@ -31,7 +31,7 @@ export class Paddle {
     const rows = [];
 
     // Find out how many balls per row
-    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+    for (let i = 0; i < this.pong.gameBalls.length; i++) {
       const gameBall = this.pong.gameBalls[i];
 
       if (
@@ -65,7 +65,7 @@ export class Paddle {
     const rows = [];
 
     // Find out how many balls per row
-    for (let i = 0; i < this.pong.numOfGameBalls; i++) {
+    for (let i = 0; i < this.pong.gameBalls.length; i++) {
       const gameBall = this.pong.gameBalls[i];
 
       if (
@@ -121,10 +121,7 @@ export class Paddle {
       else this.yChange = 0;
     }
   }
-  reset() {
-    this.color = "#fff";
-    this.height = 100;
-  }
+
   show() {
     Render.drawRectangle(this.color, this.width, this.height, this.x, this.y);
   }

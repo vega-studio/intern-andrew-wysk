@@ -8,6 +8,10 @@ import { GrowBall } from "./power-ups/grow-ball.js";
 import { PaddleColorBall } from "./power-ups/paddle-color-ball.js";
 import { ShrinkBall } from "./power-ups/shrink-ball.js";
 
+// TO DO:
+// Make a ball shooter
+// Make ball/ball collisions
+
 export class Pong {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
@@ -24,13 +28,16 @@ export class Pong {
     this.paddleHeight = 100;
     this.radius = 8;
     this.velocity = 10;
+    this.theta = Math.PI;
+    this.altColor = "#f00";
+
     this.activeAI1 = false;
     this.activeAI2 = false;
     this.keys = {};
+    this.pause = false;
     // Delay for AI when there is chaos
     this.loseReactionTime = 0;
-
-    this.numOfGameBalls = 1000;
+    this.scoreDist = 0;
     this.gameBalls = [];
 
     // Power up balls
@@ -89,7 +96,7 @@ export class Pong {
     this.paddle1 = new Paddle(
       this,
       0,
-      this.screenSize.height / 2 - this.paddleHeight,
+      this.screenSize.height / 2 - this.paddleHeight / 2,
       this.paddleWidth,
       this.paddleHeight,
       this.velocity,
@@ -101,7 +108,7 @@ export class Pong {
     this.paddle2 = new Paddle(
       this,
       this.screenSize.width - this.paddleWidth,
-      this.screenSize.height / 2 - this.paddleHeight,
+      this.screenSize.height / 2 - this.paddleHeight / 2,
       this.paddleWidth,
       this.paddleHeight,
       this.velocity,
@@ -109,31 +116,17 @@ export class Pong {
       this.loseReactionTime
     );
 
-    for (let i = 0; i < this.numOfGameBalls; i++) {
-      if (i % 2 === 0) {
-        this.gameBalls.push(
-          new Ball(
-            this.screenSize.width / 2,
-            this.screenSize.height / 2 +
-              Math.random() * (this.screenSize.height / 2 - 350),
-            this.radius,
-            this.velocity,
-            "#f00"
-          )
-        );
-      } else {
-        this.gameBalls.push(
-          new Ball(
-            this.screenSize.width / 2,
-            this.screenSize.height / 2 -
-              Math.random() * (this.screenSize.height / 2 - 350),
-            this.radius,
-            this.velocity,
-            "#f00"
-          )
-        );
-      }
-    }
+    this.gameBalls.push(
+      new Ball(
+        this.screenSize.width / 2,
+        this.screenSize.height / 2 +
+          Math.random() * (this.screenSize.height / 2 - 350),
+        this.radius,
+        this.velocity,
+        "#f00",
+        this.theta
+      )
+    );
 
     this.initGame();
   }
@@ -142,15 +135,11 @@ export class Pong {
    * Score checks whether ball reached either end and adds to score accordingly. It also resets everything after
    */
   score() {
-    for (let i = 0; i < this.numOfGameBalls; i++) {
+    for (let i = 0; i < this.gameBalls.length; i++) {
       const gameBall = this.gameBalls[i];
       if (gameBall.x - gameBall.radius < -5) {
         this.score2++;
         gameBall.velocity = 10;
-        this.paddle1.velocity = 10;
-        this.paddle2.velocity = 10;
-        this.powerUpBalls[0].balls = [];
-        this.loseReactionTime = 0;
         if (i % 2 == 0) {
           gameBall.reset(
             this.screenSize.width / 2,
@@ -164,15 +153,12 @@ export class Pong {
               Math.random() * (this.screenSize.height / 2 - 350)
           );
         }
-        this.paddle1.reset();
-        this.paddle2.reset();
+        this.powerUpBalls.forEach((e) => {
+          e.reset(i);
+        });
       } else if (gameBall.x + gameBall.radius > this.screenSize.width + 5) {
         this.score1++;
         gameBall.velocity = 10;
-        this.paddle1.velocity = 10;
-        this.paddle2.velocity = 10;
-        this.powerUpBalls[0].balls = [];
-        this.loseReactionTime = 0;
         if (i % 2 == 0) {
           gameBall.reset(
             this.screenSize.width / 2,
@@ -186,8 +172,9 @@ export class Pong {
               Math.random() * (this.screenSize.height / 2 - 350)
           );
         }
-        this.paddle1.reset();
-        this.paddle2.reset();
+        this.powerUpBalls.forEach((e) => {
+          e.reset(i);
+        });
       }
     }
   }
@@ -198,6 +185,17 @@ export class Pong {
    *
    */
   displayScore(dim, score) {
+    if (this.gameBalls.length < 10) {
+      this.scoreDist = 50;
+    } else if (this.gameBalls.length < 100) {
+      this.scoreDist = 100;
+    } else if (this.gameBalls.length < 1000) {
+      this.scoreDist = 150;
+    } else if (this.gameBalls.length < 10000) {
+      this.scoreDist = 200;
+    } else {
+      this.scoreDist = 250;
+    }
     // Center line
     Render.drawRectangle(
       "#fff",
@@ -206,12 +204,19 @@ export class Pong {
       this.screenSize.width / 2 + 11.5,
       0
     );
+    // Ball shooter
+    Render.drawCircle(
+      "#808080",
+      50,
+      this.screenSize.width / 2 + 14,
+      this.screenSize.height / 2
+    );
     Render.drawText(
       "#fff",
       "MAKE PLAYER 1 AI: [1]",
       12.5,
       "Arial",
-      this.screenSize.width - 150,
+      this.screenSize.width - 270,
       15
     );
     Render.drawText(
@@ -219,7 +224,7 @@ export class Pong {
       "MAKE PLAYER 2 AI: [2]",
       12.5,
       "Arial",
-      this.screenSize.width - 150,
+      this.screenSize.width - 270,
       30
     );
     Render.drawText(
@@ -227,8 +232,48 @@ export class Pong {
       "TURN OFF ALL AI: [o]",
       12.5,
       "Arial",
-      this.screenSize.width - 150,
+      this.screenSize.width - 270,
       45
+    );
+    Render.drawText(
+      "#fff",
+      "INCREASE BALLS BY ONE: [i]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 270,
+      60
+    );
+    Render.drawText(
+      "#fff",
+      "INCREASE BALLS BY ONE HUNDRED: [I]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 270,
+      75
+    );
+    Render.drawText(
+      "#fff",
+      "DECREASE BALLS BY ONE: [d]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 270,
+      90
+    );
+    Render.drawText(
+      "#fff",
+      "DECREASE BALLS BY ONE HUNDRED: [D]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 270,
+      105
+    );
+    Render.drawText(
+      "#fff",
+      "PAUSE/PLAY: [p]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 270,
+      120
     );
     Render.drawText(
       "#fff",
@@ -278,52 +323,44 @@ export class Pong {
       25,
       90
     );
+    Render.drawText(
+      "#fff",
+      "BALLS IN PLAY: " + this.gameBalls.length,
+      25,
+      "Arial",
+      25,
+      this.screenSize.height - 30
+    );
     if (score === this.score1)
-      if (score >= 10)
-        Render.drawText(
-          "#fff",
-          9,
-          50,
-          "Arial",
-          this.screenSize.width / 2 - 30,
-          45
-        );
-      else
-        Render.drawText(
-          "#fff",
-          score,
-          50,
-          "Arial",
-          this.screenSize.width / 2 - 30,
-          45
-        );
+      Render.drawText(
+        "#fff",
+        score,
+        50,
+        "Arial",
+        this.screenSize.width / 2 - this.scoreDist,
+        45
+      );
     if (score === this.score2)
-      if (score >= 10)
-        Render.drawText(
-          "#fff",
-          9,
-          50,
-          "Arial",
-          this.screenSize.width / 2 + 30,
-          45
-        );
-      else
-        Render.drawText(
-          "#fff",
-          score,
-          50,
-          "Arial",
-          this.screenSize.width / 2 + 30,
-          45
-        );
-    if (this.score1 >= 10 || this.score2 >= 10) {
+      Render.drawText(
+        "#fff",
+        score,
+        50,
+        "Arial",
+        this.screenSize.width / 2 + this.scoreDist,
+        45
+      );
+    if (
+      this.score1 >= this.gameBalls.length * 10 ||
+      this.score2 >= this.gameBalls.length * 10
+    ) {
       // Win feature -- add win string ("PLAYER _ WINS!") and delay restart
       let winX =
-        this.score1 >= 10
+        this.score1 >= this.gameBalls.length * 10
           ? this.screenSize.width / 2 - 475
           : this.screenSize.width / 2 + 100;
-      let player = this.score1 >= 10 ? "PLAYER 1" : "PLAYER 2";
-      if (this.score1 >= 10) this.score2 = 0;
+      let player =
+        this.score1 >= this.gameBalls.length * 10 ? "PLAYER 1" : "PLAYER 2";
+      if (this.score1 >= this.gameBalls.length * 10) this.score2 = 0;
       else this.score1 = 0;
       Render.drawText(
         "#fff",
@@ -345,7 +382,9 @@ export class Pong {
    */
   loop = () => {
     Render.clearRectangle(this.screenSize.width, this.screenSize.height);
-    this.play();
+    if (this.pause === false) {
+      this.play();
+    }
     this.show();
     requestAnimationFrame(this.loop);
   };
@@ -354,6 +393,7 @@ export class Pong {
     // Register input events
     window.addEventListener("keydown", (event) => {
       this.keys[event.key] = true;
+      this.pauseGame();
     });
     window.addEventListener("keyup", (event) => {
       this.keys[event.key] = false;
@@ -362,22 +402,101 @@ export class Pong {
     this.loop();
   }
 
+  pauseGame() {
+    if (this.keys["p"]) {
+      this.pause = !this.pause;
+      this.keys["p"] = false;
+    }
+  }
+
+  gameBallHit(ball1, ball2) {
+    const point1 = [ball1.x, ball1.y];
+    const point2 = [ball2.x, ball2.y];
+    const distSquared =
+      Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2);
+    const sum = ball1.radius + ball2.radius;
+    return distSquared <= Math.pow(sum, 2);
+  }
+
   play() {
+    // Increase/decrease balls
+    if (this.keys["i"]) {
+      this.keys["i"] = false;
+      if (this.gameBalls.length < 100000) {
+        this.gameBalls.push(
+          new Ball(
+            this.screenSize.width / 2,
+            this.screenSize.height / 2 + 50 - Math.random() * 100,
+            this.radius,
+            this.velocity,
+            this.altColor,
+            this.theta
+          )
+        );
+        if (this.theta < 5) {
+          this.theta *= 2;
+        } else {
+          this.theta /= 2;
+        }
+        if (this.theta < 5) {
+          this.altColor = "#f00";
+        } else {
+          this.altColor = "#00f";
+        }
+      }
+    }
+    if (this.keys["I"]) {
+      this.keys["I"] = false;
+      if (this.gameBalls.length < 100000) {
+        for (let i = 0; i < 100; i++) {
+          this.gameBalls.push(
+            new Ball(
+              this.screenSize.width / 2,
+              this.screenSize.height / 2 + 50 - Math.random() * 100,
+              this.radius,
+              this.velocity,
+              this.altColor,
+              this.theta
+            )
+          );
+          if (this.theta < 5) {
+            this.theta *= 2;
+          } else {
+            this.theta /= 2;
+          }
+          if (this.theta < 5) {
+            this.altColor = "#f00";
+          } else {
+            this.altColor = "#00f";
+          }
+        }
+      }
+    }
+    if (this.keys["d"]) {
+      this.keys["d"] = false;
+      if (this.gameBalls.length !== 1) {
+        this.gameBalls.pop();
+      }
+    }
+    if (this.keys["D"]) {
+      this.keys["D"] = false;
+      if (this.gameBalls.length > 100) {
+        for (let i = 0; i < 100; i++) {
+          this.gameBalls.pop();
+        }
+      }
+    }
     // Power Ups
     this.powerUpBalls.forEach((e) => {
       {
         e.play();
       }
     });
-    // Gives chaos balls random direction
-    for (let i = 0; i < this.powerUpBalls[0].balls.length; i++) {
-      this.powerUpBalls[0].balls[i].theta = Math.random() * 2 * Math.PI;
-    }
     // Move player 1
     if (this.keys["1"]) this.activeAI1 = true;
     if (this.activeAI1) {
-      if (this.numOfGameBalls === 1) {
-        for (let i = 0; i < this.numOfGameBalls; i++) {
+      if (this.gameBalls.length === 1) {
+        for (let i = 0; i < this.gameBalls.length; i++) {
           const gameBall = this.gameBalls[i];
           this.paddle1.positionAI(gameBall);
           if (gameBall.color === "#00f") {
@@ -401,8 +520,8 @@ export class Pong {
     // Move player 2
     if (this.keys["2"]) this.activeAI2 = true;
     if (this.activeAI2) {
-      if (this.numOfGameBalls === 1) {
-        for (let i = 0; i < this.numOfGameBalls; i++) {
+      if (this.gameBalls.length === 1) {
+        for (let i = 0; i < this.gameBalls.length; i++) {
           const gameBall = this.gameBalls[i];
           this.paddle2.positionAI(gameBall);
           if (gameBall.color === "#f00") {
@@ -433,8 +552,8 @@ export class Pong {
     this.paddle1.position();
     this.paddle2.position();
 
-    // Ceiling bounce
-    for (let i = 0; i < this.numOfGameBalls; i++) {
+    // Ceiling/floor bounce
+    for (let i = 0; i < this.gameBalls.length; i++) {
       const gameBall = this.gameBalls[i];
       if (
         gameBall.y - gameBall.radius <= 0 ||
@@ -445,7 +564,7 @@ export class Pong {
     }
 
     // Paddle bounce
-    for (let i = 0; i < this.numOfGameBalls; i++) {
+    for (let i = 0; i < this.gameBalls.length; i++) {
       const gameBall = this.gameBalls[i];
       if (
         gameBall.x - gameBall.radius <= this.paddle1.x + this.paddle1.width &&
@@ -459,7 +578,7 @@ export class Pong {
           relativeIntersectY / (this.paddle1.height / 2);
         let bounceAngle =
           normalizedRelativeIntersectionY * ((5 * Math.PI) / 12);
-        gameBall.theta = bounceAngle;
+        gameBall.theta = bounceAngle * -1;
         gameBall.color = "#00f";
       } else if (
         gameBall.x + gameBall.radius >= this.paddle2.x &&
@@ -473,8 +592,19 @@ export class Pong {
           relativeIntersectY / (this.paddle2.height / 2);
         let bounceAngle =
           normalizedRelativeIntersectionY * ((5 * Math.PI) / 12);
-        gameBall.theta = Math.PI - bounceAngle;
+        gameBall.theta = (Math.PI - bounceAngle) * -1;
         gameBall.color = "#f00";
+      }
+      // Ball/ball collision
+      for (let i = 0; i < this.gameBalls.length; i++) {
+        for (let j = i + 1; j < this.gameBalls.length; j++) {
+          if (i !== j) {
+            if (this.gameBallHit(this.gameBalls[i], this.gameBalls[j])) {
+              this.gameBalls[i].theta += Math.PI;
+              this.gameBalls[j].theta += Math.PI;
+            }
+          }
+        }
       }
 
       // Position the ball according to it's current state
