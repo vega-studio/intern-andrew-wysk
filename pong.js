@@ -29,6 +29,7 @@ export class Pong {
 
     this.activeAI1 = false;
     this.activeAI2 = false;
+    this.ballCollisionsActive = false;
     this.keys = {};
     this.pause = false;
     // Delay for AI when there is chaos
@@ -273,6 +274,22 @@ export class Pong {
     );
     Render.drawText(
       "#fff",
+      "BALL COLLISIONS ON: [c]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 270,
+      135
+    );
+    Render.drawText(
+      "#fff",
+      "BALL COLLISIONS OFF: [x]",
+      12.5,
+      "Arial",
+      this.screenSize.width - 270,
+      150
+    );
+    Render.drawText(
+      "#fff",
       "RED BALL: HIT TO CREATE CHAOS ON YOUR OPPONENT'S SIDE",
       12.5,
       "Arial",
@@ -415,6 +432,13 @@ export class Pong {
   }
 
   play() {
+    // Ball collisions on/off
+    if (this.keys["c"]) {
+      this.ballCollisionsActive = true;
+    }
+    if (this.keys["x"]) {
+      this.ballCollisionsActive = false;
+    }
     // Increase/decrease balls
     if (this.keys["i"]) {
       this.keys["i"] = false;
@@ -592,12 +616,14 @@ export class Pong {
         gameBall.color = "#f00";
       }
       // Ball/ball collision
-      for (let i = 0; i < this.gameBalls.length; i++) {
-        for (let j = i + 1; j < this.gameBalls.length; j++) {
-          if (i !== j) {
-            if (this.gameBallHit(this.gameBalls[i], this.gameBalls[j])) {
-              this.gameBalls[i].theta += Math.PI;
-              this.gameBalls[j].theta += Math.PI;
+      if (this.ballCollisionsActive) {
+        for (let i = 0; i < this.gameBalls.length; i++) {
+          for (let j = i + 1; j < this.gameBalls.length; j++) {
+            if (i !== j) {
+              if (this.gameBallHit(this.gameBalls[i], this.gameBalls[j])) {
+                this.gameBalls[i].theta += Math.PI;
+                this.gameBalls[j].theta += Math.PI;
+              }
             }
           }
         }
