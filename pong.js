@@ -8,10 +8,6 @@ import { GrowBall } from "./power-ups/grow-ball.js";
 import { PaddleColorBall } from "./power-ups/paddle-color-ball.js";
 import { ShrinkBall } from "./power-ups/shrink-ball.js";
 
-// TO DO:
-// Make a ball shooter
-// Make ball/ball collisions
-
 export class Pong {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
