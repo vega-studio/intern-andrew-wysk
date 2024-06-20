@@ -25,6 +25,7 @@ export class QuadTreeDemo {
     this.allHits = new Set();
     this.fullHits = new Set();
     this.partialHits = new Set();
+    debugger;
     this.tree = new QuadTree(
       new Bounds(0, 0, this.screenSize.width, this.screenSize.height)
     );
