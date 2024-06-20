@@ -12,7 +12,7 @@ export class QuadTreeDemo {
     this.dimension = this.canvas.getContext("2d");
     RenderQuad.setContext(this.dimension);
     this.particles = [];
-    for (let i = 0; i < 5000; i++) {
+    for (let i = 0; i < 50000; i++) {
       this.particles.push(
         new Bounds(
           this.screenSize.width * Math.random() + 1,
@@ -70,10 +70,7 @@ export class QuadTreeDemo {
     this.fullHits = new Set();
     this.partialHits = new Set();
     this.tree = new QuadTree(
-      0,
-      0,
-      this.screenSize.width,
-      this.screenSize.height
+      new Bounds(0, 0, this.screenSize.width, this.screenSize.height)
     );
     this.particles.forEach((particle) => {
       const hits = this.tree.add(particle);
