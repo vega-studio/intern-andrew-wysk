@@ -16,11 +16,11 @@ export class RenderQuad {
   }
 
   static drawRectangle(color, object) {
-    x = screenToContext(x);
-    y = screenToContext(y);
-    width = screenToContext(width);
-    height = screenToContext(height);
+    let x = screenToContext(object.x);
+    let y = screenToContext(object.y);
+    let width = screenToContext(object.width);
+    let height = screenToContext(object.height);
     RenderQuad.ctx.fillStyle = color;
-    RenderQuad.ctx.fillRect(object.x, object.y, object.width, object.height);
+    RenderQuad.ctx.fillRect(x, y, width, height);
   }
 }

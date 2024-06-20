@@ -1,52 +1,90 @@
 import { Bounds } from "./bounds.js";
-import { RenderQuad } from "./render-quad.js";
-
+// Population limit = 2
 export class QuadTree {
-  constructor(canvasId) {
-    this.canvas = document.getElementById(canvasId);
-    this.screenSize = this.canvas.getBoundingClientRect();
-    this.canvas.width = this.screenSize.width * window.devicePixelRatio;
-    this.canvas.height = this.screenSize.height * window.devicePixelRatio;
-    this.dimension = this.canvas.getContext("2d");
-    RenderQuad.setContext(this.dimension);
+  constructor(bounds) {
+    this.bounds = bounds;
     this.particles = [];
-    for (let i = 0; i < 5000; i++) {
-      this.particles.push(
-        new Bounds(
-          this.screenSize.width * Math.random(),
-          this.screenSize.height * Math.random(),
-          5 * Math.random(),
-          5 * Math.random()
-        )
-      );
-    }
-    this.fullHits = [];
-    this.partialHits = [];
-    for (let i = 0; i < this.particles.length; i++) {
-      for (let j = i + 1; j < this.particles.length; j++) {
-        if (this.particles[i].hitTest(this.particles[j]) === 2) {
-          this.fullHits.push(this.particles[i]);
-          this.fullHits.push(this.particles[j]);
-        } else if (this.particles[i].hitTest(this.particles[j]) === 1) {
-          this.partialHits.push(this.particles[i]);
-          this.partialHits.push(this.particles[j]);
-        }
-      }
-    }
+    this.isSplit = false;
   }
-  //   loop = () => {
-  //     RenderQuad.clearRectangle(this.screenSize.width, this.screenSize.height);
-  //     this.play();
-  //     requestAnimationFrame(this.loop);
-  //   };
-  play() {
-    particles.forEach((particle) => {
-      if (fullHits.has(particle)) RenderQuad.drawRectangle("#f00", particle);
-      else if (partialHits.has(particle)) {
-        RenderQuad.drawRectangle("#ff0", particle);
-      } else {
-        RenderQuad.drawRectangle("#0f0", particle);
+
+  split() {
+    this.isSplit = true;
+    // Split into four sections
+    this.topLeft = new QuadTree(
+      new Bounds(
+        this.bounds.x,
+        this.bounds.y,
+        this.bounds.width / 2,
+        this.bounds.height / 2
+      )
+    );
+    this.topRight = new QuadTree(
+      new Bounds(
+        this.bounds.x + this.bounds.width / 2,
+        this.bounds.y,
+        this.bounds.width / 2,
+        this.bounds.height / 2
+      )
+    );
+    this.bottomLeft = new QuadTree(
+      new Bounds(
+        this.bounds.x,
+        this.bounds.y + this.bounds.height / 2,
+        this.bounds.width / 2,
+        this.bounds.height / 2
+      )
+    );
+    this.bottomRight = new QuadTree(
+      new Bounds(
+        this.bounds.x + this.bounds.width / 2,
+        this.bounds.y + this.bounds.height / 2,
+        this.bounds.width / 2,
+        this.bounds.height / 2
+      )
+    );
+  }
+
+  add(child) {
+    let hits = [];
+    // Don't add if not in bounds (base case)
+    if (this.bounds.hitTest(child) === 0) {
+      return hits;
+    }
+    // Don't go over max population
+    if (this.particles.length < 2 && !this.isSplit) {
+      this.particles.push(child);
+      return hits;
+    }
+    if (!this.isSplit) {
+      this.split();
+    }
+    // Recursively adds children to hits and to subquads
+    if (this.isSplit) {
+      const topLeftHits = this.topLeft.add(child);
+      const topRightHits = this.topRight.add(child);
+      const bottomLeftHits = this.bottomLeft.add(child);
+      const bottomRightHits = this.bottomRight.add(child);
+      topLeftHits.forEach((c) => {
+        hits.push(c);
+      });
+      topRightHits.forEach((c) => {
+        hits.push(c);
+      });
+      bottomLeftHits.forEach((c) => {
+        hits.push(c);
+      });
+      bottomRightHits.forEach((c) => {
+        hits.push(c);
+      });
+    }
+    // Adds intersections
+    this.particles.forEach((p) => {
+      const hit = p.hitTest(child);
+      if (hit > 0) {
+        hits.push(p);
       }
     });
+
+    return hits;
   }
 }

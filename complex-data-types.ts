@@ -161,7 +161,7 @@
 // particles.forEach((particle) => {
 //   if (allHits.has(particle))
 //     renderRed(
-//       /*Will just be render("#f00" (or whatever the red color code is for ts), particle)*/ particle
+//       /*Will just be render("#f00", particle)*/ particle
 //     );
 //   else renderBlue(particle);
 // });

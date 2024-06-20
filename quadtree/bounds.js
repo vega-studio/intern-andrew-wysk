@@ -6,8 +6,8 @@ export class Bounds {
     this.height = height;
   }
 
-  // return 1 if they overlap
   // return 0 if no intersection
+  // return 1 if they overlap
   // return 2 if testBounds completely within this bounds
   hitTest(testBounds) {
     const boundWidth = this.x + this.width;
