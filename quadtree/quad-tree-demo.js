@@ -12,13 +12,13 @@ export class QuadTreeDemo {
     this.dimension = this.canvas.getContext("2d");
     RenderQuad.setContext(this.dimension);
     this.particles = [];
-    for (let i = 0; i < 50000; i++) {
+    for (let i = 0; i < 250; i++) {
       this.particles.push(
         new Bounds(
           this.screenSize.width * Math.random() + 1,
           this.screenSize.height * Math.random() + 1,
-          5 * Math.random() + 1,
-          5 * Math.random() + 1
+          50 * Math.random() + 1,
+          50 * Math.random() + 1
         )
       );
     }

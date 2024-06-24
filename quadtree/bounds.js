@@ -21,9 +21,7 @@ export class Bounds {
       testBounds.y >= boundHeight
     ) {
       return 0;
-    }
-
-    if (
+    } else if (
       testBounds.x >= this.x &&
       testWidth <= boundWidth &&
       testBounds.y >= this.y &&

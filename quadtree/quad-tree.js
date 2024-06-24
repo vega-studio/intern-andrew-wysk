@@ -50,6 +50,13 @@ export class QuadTree {
     if (this.bounds.hitTest(child) === 0) {
       return hits;
     }
+    // Adds intersections
+    this.particles.forEach((p) => {
+      const hit = p.hitTest(child);
+      if (hit > 0) {
+        hits.push(p);
+      }
+    });
     // Don't go over max population
     if (this.particles.length < 2 && !this.isSplit) {
       this.particles.push(child);
@@ -58,32 +65,22 @@ export class QuadTree {
     if (!this.isSplit) {
       this.split();
     }
+
     // Recursively adds children to hits and to subquads
     if (this.isSplit) {
-      const topLeftHits = this.topLeft.add(child);
-      const topRightHits = this.topRight.add(child);
-      const bottomLeftHits = this.bottomLeft.add(child);
-      const bottomRightHits = this.bottomRight.add(child);
-      topLeftHits.forEach((c) => {
-        hits.push(c);
-      });
-      topRightHits.forEach((c) => {
-        hits.push(c);
-      });
-      bottomLeftHits.forEach((c) => {
-        hits.push(c);
-      });
-      bottomRightHits.forEach((c) => {
-        hits.push(c);
+      const subQuadTrees = [
+        this.topLeft,
+        this.topRight,
+        this.bottomLeft,
+        this.bottomRight,
+      ];
+      subQuadTrees.forEach((subQuadTree) => {
+        const subHits = subQuadTree.add(child);
+        subHits.forEach((hit) => {
+          hits.push(hit);
+        });
       });
     }
-    // Adds intersections
-    this.particles.forEach((p) => {
-      const hit = p.hitTest(child);
-      if (hit > 0) {
-        hits.push(p);
-      }
-    });
 
     return hits;
   }
