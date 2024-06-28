@@ -1,6 +1,6 @@
 import { Bounds } from "./bounds.js";
 
-let i, iMax, p, hit;
+let i, j, iMax, p, hit;
 
 // Population limit = 2
 export class QuadTree {
@@ -13,9 +13,6 @@ export class QuadTree {
   split() {
     const children = this.particles;
     this.particles = [];
-    children.forEach((c) => {
-      this.add(c);
-    });
     this.isSplit = true;
     // Split into four sections
     this.topLeft = new QuadTree(
@@ -50,6 +47,9 @@ export class QuadTree {
         this.bounds.height / 2
       )
     );
+    children.forEach((c) => {
+      this.add(c);
+    });
   }
 
   add(child, out = []) {
@@ -86,16 +86,18 @@ export class QuadTree {
         this.bottomRight,
       ];
 
-      subQuadTrees.some((subQuadTree, _index, _arr) => {
-        const test = subQuadTree.bounds.hitTest(child) > 0;
+      for (j = 0; j < subQuadTrees.length; j++) {
+        const subQuadTree = subQuadTrees[j];
+        const test = subQuadTree.bounds.hitTest(child);
+
         if (test > 1) {
           subQuadTree.add(child, out);
-          return true;
+          break;
         } else if (test > 0) {
-          this.particles.add(child);
-          return true;
+          this.particles.push(child);
+          break;
         }
-      });
+      }
     }
 
     return out;
