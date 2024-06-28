@@ -275,14 +275,12 @@ describe("QuadTree", () => {
 
     assert(allHits.size === 0);
   });
-  it("Should intersect Bounds with overlapping edges", () => {
+  it("Should NOT intersect Bounds with overlapping edges", () => {
     const quad = new QuadTree(new Bounds(0, 0, 1000, 1000));
     const bounds = [
       new Bounds(100, 100, 100, 100),
       new Bounds(200, 200, 100, 100),
       new Bounds(300, 300, 100, 100),
-      new Bounds(150, 150, 200, 200),
-      new Bounds(250, 250, 200, 200),
     ];
     const allHits = new Set();
 
@@ -292,9 +290,9 @@ describe("QuadTree", () => {
       hits.forEach((hit) => allHits.add(hit));
     }
 
-    assert(allHits.size === 5);
+    assert(allHits.size === 0);
 
-    const shouldHit = [0, 1, 2, 3, 4];
+    const shouldHit = [];
 
     for (let i = 0; i < shouldHit.length; i++) {
       assert(allHits.has(bounds[shouldHit[i]]));

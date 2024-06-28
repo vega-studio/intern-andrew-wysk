@@ -1,4 +1,5 @@
 import { Bounds } from "./bounds.js";
+import { RenderQuad } from "./render-quad.js";
 
 let i, j, iMax, p, hit;
 
@@ -96,5 +97,16 @@ export class QuadTree {
     }
 
     return out;
+  }
+
+  draw(lineWidth = 10) {
+    RenderQuad.drawOutline("#ff0000", Math.max(lineWidth, 1), this.bounds);
+
+    if (this.isSplit) {
+      this.topLeft.draw(lineWidth - 2);
+      this.topRight.draw(lineWidth - 2);
+      this.bottomLeft.draw(lineWidth - 2);
+      this.bottomRight.draw(lineWidth - 2);
+    }
   }
 }
