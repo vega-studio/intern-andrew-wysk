@@ -53,11 +53,6 @@ export class QuadTree {
   }
 
   add(child, out = []) {
-    // Don't add if not in bounds (base case)
-    if (this.bounds.hitTest(child) === 0) {
-      return out;
-    }
-
     // Adds intersections
     for (i = 0, iMax = this.particles.length; i < iMax; i++) {
       p = this.particles[i];

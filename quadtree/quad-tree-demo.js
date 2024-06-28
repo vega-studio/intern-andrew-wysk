@@ -71,10 +71,13 @@ export class QuadTreeDemo {
     this.tree = new QuadTree(
       new Bounds(0, 0, this.screenSize.width, this.screenSize.height)
     );
+
     this.particles.forEach((particle) => {
       const hits = this.tree.add(particle);
+
       hits.forEach((hit) => {
         const collisionType = hit.hitTest(particle);
+
         if (collisionType === 2) {
           this.fullHits.add(hit);
           this.fullHits.add(particle);
@@ -82,17 +85,30 @@ export class QuadTreeDemo {
           this.partialHits.add(hit);
           this.partialHits.add(particle);
         }
+
         this.allHits.add(hit);
       });
     });
+
     this.particles.forEach((particle) => {
       if (this.fullHits.has(particle)) {
-        RenderQuad.drawRectangle("#f00", particle);
+        RenderQuad.drawRectangle(rgbToHex(255, 0, 0), particle);
       } else if (this.partialHits.has(particle)) {
-        RenderQuad.drawRectangle("#ff0", particle);
+        RenderQuad.drawRectangle(rgbToHex(255, 255, 0), particle);
       } else {
-        RenderQuad.drawRectangle("#0f0", particle);
+        RenderQuad.drawRectangle(
+          rgbToHex(
+            0,
+            Math.floor(Math.random() * 255) | 1,
+            Math.floor(Math.random() * 255) | 1
+          ),
+          particle
+        );
       }
     });
   }
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }

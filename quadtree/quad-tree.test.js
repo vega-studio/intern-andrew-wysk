@@ -47,6 +47,10 @@ describe("QuadTree", () => {
     const inter1 = [new Bounds(0, 0, 5, 5), new Bounds(4, 4, 5, 5)];
     assert(inter1[0].hitTest(inter1[1]) === 1);
   });
+  it("Edges at exact border corner should NOT intersect", () => {
+    const inter1 = [new Bounds(0, 0, 5, 5), new Bounds(5, 5, 5, 5)];
+    assert(inter1[0].hitTest(inter1[1]) === 0);
+  });
   it("Should handle two bounds overlapping at their sides in the middle", () => {
     const inter2 = [new Bounds(500, 500, 5, 5), new Bounds(504, 504, 5, 5)];
     assert(inter2[0].hitTest(inter2[1]) === 1);
