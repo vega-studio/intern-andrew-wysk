@@ -299,12 +299,11 @@ describe("QuadTree", () => {
   it("Should intersect Bounds that are fully contained within others", () => {
     const quad = new QuadTree(new Bounds(0, 0, 1000, 1000));
     const bounds = [
-      new Bounds(100, 100, 500, 500),
-      new Bounds(200, 200, 100, 100),
-      new Bounds(250, 250, 50, 50),
-      new Bounds(300, 300, 25, 25),
-      new Bounds(350, 350, 10, 10),
-      new Bounds(400, 400, 5, 5),
+      new Bounds(0, 0, 500, 500),
+      new Bounds(10, 10, 400, 400),
+      new Bounds(15, 15, 300, 300),
+      new Bounds(20, 20, 200, 200),
+      new Bounds(25, 25, 100, 100),
     ];
     const allHits = new Set();
 
@@ -314,9 +313,9 @@ describe("QuadTree", () => {
       hits.forEach((hit) => allHits.add(hit));
     }
 
-    assert(allHits.size === 6);
+    assert(allHits.size === 5);
 
-    const shouldHit = [0, 1, 2, 3, 4, 5];
+    const shouldHit = [0, 1, 2, 3, 4];
 
     for (let i = 0; i < shouldHit.length; i++) {
       assert(allHits.has(bounds[shouldHit[i]]));

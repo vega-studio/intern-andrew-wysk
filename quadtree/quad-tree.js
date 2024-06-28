@@ -8,6 +8,11 @@ export class QuadTree {
   }
 
   split() {
+    const children = this.particles;
+    this.particles = [];
+    children.forEach((c) => {
+      this.add(c);
+    });
     this.isSplit = true;
     // Split into four sections
     this.topLeft = new QuadTree(
@@ -67,6 +72,7 @@ export class QuadTree {
     }
 
     // Recursively adds children to hits and to subquads
+
     if (this.isSplit) {
       const subQuadTrees = [
         this.topLeft,
@@ -75,10 +81,13 @@ export class QuadTree {
         this.bottomRight,
       ];
       subQuadTrees.forEach((subQuadTree) => {
-        const subHits = subQuadTree.add(child);
-        subHits.forEach((hit) => {
-          hits.push(hit);
-        });
+        if (subQuadTree.bounds.hitTest(child) > 0) {
+          const subHits = subQuadTree.add(child);
+          subHits.forEach((hit) => {
+            hits.push(hit);
+          });
+          return;
+        }
       });
     }
 
