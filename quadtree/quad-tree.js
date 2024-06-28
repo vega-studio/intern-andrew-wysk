@@ -1,4 +1,7 @@
 import { Bounds } from "./bounds.js";
+
+let i, iMax, p, hit;
+
 // Population limit = 2
 export class QuadTree {
   constructor(bounds) {
@@ -49,48 +52,52 @@ export class QuadTree {
     );
   }
 
-  add(child) {
-    let hits = [];
+  add(child, out = []) {
     // Don't add if not in bounds (base case)
     if (this.bounds.hitTest(child) === 0) {
-      return hits;
+      return out;
     }
+
     // Adds intersections
-    this.particles.forEach((p) => {
-      const hit = p.hitTest(child);
+    for (i = 0, iMax = this.particles.length; i < iMax; i++) {
+      p = this.particles[i];
+      hit = p.hitTest(child);
+
       if (hit > 0) {
-        hits.push(p);
+        out.push(p);
       }
-    });
-    // Don't go over max population
-    if (this.particles.length < 2 && !this.isSplit) {
-      this.particles.push(child);
-      return hits;
     }
+
+    // Don't go over max population
     if (!this.isSplit) {
+      if (this.particles.length < 2) {
+        this.particles.push(child);
+        return out;
+      }
       this.split();
     }
 
     // Recursively adds children to hits and to subquads
-
-    if (this.isSplit) {
+    else {
       const subQuadTrees = [
         this.topLeft,
         this.topRight,
         this.bottomLeft,
         this.bottomRight,
       ];
-      subQuadTrees.forEach((subQuadTree) => {
-        if (subQuadTree.bounds.hitTest(child) > 0) {
-          const subHits = subQuadTree.add(child);
-          subHits.forEach((hit) => {
-            hits.push(hit);
-          });
-          return;
+
+      subQuadTrees.some((subQuadTree, _index, _arr) => {
+        const test = subQuadTree.bounds.hitTest(child) > 0;
+        if (test > 1) {
+          subQuadTree.add(child, out);
+          return true;
+        } else if (test > 0) {
+          this.particles.add(child);
+          return true;
         }
       });
     }
 
-    return hits;
+    return out;
   }
 }

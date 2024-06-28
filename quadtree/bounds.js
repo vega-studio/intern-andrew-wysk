@@ -1,3 +1,8 @@
+let boundWidth = 0;
+let testWidth = 0;
+let boundHeight = 0;
+let testHeight = 0;
+
 export class Bounds {
   constructor(x, y, width, height) {
     this.x = x;
@@ -10,10 +15,11 @@ export class Bounds {
   // return 1 if they overlap
   // return 2 if testBounds completely within this bounds
   hitTest(testBounds) {
-    const boundWidth = this.x + this.width;
-    const testWidth = testBounds.x + testBounds.width;
-    const boundHeight = this.y + this.height;
-    const testHeight = testBounds.y + testBounds.height;
+    boundWidth = this.x + this.width;
+    testWidth = testBounds.x + testBounds.width;
+    boundHeight = this.y + this.height;
+    testHeight = testBounds.y + testBounds.height;
+
     if (
       this.x >= testWidth ||
       testBounds.x >= boundWidth ||
