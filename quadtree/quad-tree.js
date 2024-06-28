@@ -11,7 +11,7 @@ export class QuadTree {
     this.isSplit = false;
   }
 
-  split() {
+  split(out) {
     const children = this.particles;
     this.particles = [];
     this.isSplit = true;
@@ -49,7 +49,7 @@ export class QuadTree {
       )
     );
     children.forEach((c) => {
-      this.add(c);
+      this.add(c, out);
     });
   }
 
@@ -70,7 +70,7 @@ export class QuadTree {
         this.particles.push(child);
         return out;
       }
-      this.split();
+      this.split(out);
     }
 
     // Recursively adds children to hits and to subquads
